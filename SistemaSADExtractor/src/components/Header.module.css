@@ -1,0 +1,48 @@
+.header {
+  background: #0E5BD7;
+  color: #fff;
+}
+
+.container {
+  max-width: 1120px; /* ~ max-w-7xl */
+  margin: 0 auto;
+  padding: 0 16px; /* px-4 */
+  height: 72px;    /* h-18 (~sm:h-20) */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.logoMark {
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  background: rgba(255,255,255,.10);
+  border-radius: 8px;
+}
+
+.titleBlock {
+  line-height: 1.1;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.subtitle {
+  opacity: .9;
+  font-size: 13px;
+}
+
+.right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
