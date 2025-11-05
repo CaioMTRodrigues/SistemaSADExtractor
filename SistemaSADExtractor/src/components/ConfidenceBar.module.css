@@ -1,0 +1,17 @@
+.wrap {
+  width: 140px;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  transition: width .2s ease;
+}
+
+.green { background: #16a34a; }
+.yellow { background: #facc15; }
+.red { background: #ef4444; }
+.gray { background: #9ca3af; }

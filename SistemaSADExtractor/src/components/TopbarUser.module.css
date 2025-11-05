@@ -1,0 +1,45 @@
+.topbar {
+  background: #0E5BD7;
+}
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+}
+.greet { font-size: 14px; }
+.bold { font-weight: 700; }
+
+.profileBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  color: #fff;
+  padding: 4px 6px 4px 4px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.profileBtn:hover { filter: brightness(1.05); }
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #fff;
+  color: #0E5BD7;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+.chev {
+  width: 14px;
+  height: 14px;
+  opacity: .9;
+}
