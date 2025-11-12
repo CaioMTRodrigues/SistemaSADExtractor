@@ -14,12 +14,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  GESTOR
+  CADASTRO
+}
+
 model User {
-  id            String    @id
+  id            String    @id @default(cuid())
   name          String
   email         String
   emailVerified Boolean   @default(false)
   image         String?
+  role          Role      @default(CADASTRO)
+  active        Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
@@ -30,7 +38,7 @@ model User {
 }
 
 model Session {
-  id        String   @id
+  id        String   @id 
   expiresAt DateTime
   token     String
   createdAt DateTime @default(now())
