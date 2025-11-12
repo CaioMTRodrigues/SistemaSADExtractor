@@ -16,4 +16,8 @@ userRouter.post("/register", (req: Request, res: Response) => {
     userController.register(req, res);
 });
 
+userRouter.post("/first-password", (req: Request, res: Response) => {
+    userController.firstPassword(req, res);
+});
+
 export default userRouter;

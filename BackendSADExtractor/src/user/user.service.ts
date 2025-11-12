@@ -1,5 +1,6 @@
 import { auth } from "../lib/auth.js";
-import { FRONTEND_URL } from "../lib/env.js";
+import { BETTER_AUTH_SECRET, FRONTEND_URL } from "../lib/env.js";
+import jwt from "jsonwebtoken";
 
 import { prisma } from "../lib/db.js";
 
@@ -24,22 +25,22 @@ export const signIn = async (email: string, password: string) => {
 // Função para admin criar usuário e enviar magic link + reset password
 export const createUser = async (email: string, name: string, role: Role) => {
   try {
-    // 1) Upsert do usuário
+    // 1) Criar usuário com active: false
     const user = await prisma.user.create({
       data: {
         email,
         name,
         role,
+        active: false,
       },
     });
 
-    // 2) Enviar magic link que já redireciona para a página de reset password
-    await auth.api.signInMagicLink({
+    // 2) Enviar magic link para cadastro de senha
+    await auth.api.requestPasswordReset({
       body: {
-        name,
         email,
+        redirectTo: "/create-password",
       },
-      headers: {},
     });
 
     return { user };
@@ -48,30 +49,29 @@ export const createUser = async (email: string, name: string, role: Role) => {
   }
 };
 
-export const resetPassword = async (password: string) => {
+export const firstPassword = async (password: string, token: string) => {
   try {
-    const token =
-      new URLSearchParams(window.location.search).get("token") || undefined;
-
     if (!token) {
-      // Handle the error
+      throw new Error("Token não informado");
     }
-
-    const data = await auth.api.resetPassword({
+    const decoded = jwt.verify(token, BETTER_AUTH_SECRET) as {
+      email: string;
+      betterAuthToken: string;
+    };
+    const result = await auth.api.resetPassword({
       body: {
-        newPassword: password, // required
-        token, // required
+        newPassword: password,
+        token: decoded.betterAuthToken,
       },
     });
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
-export const signUp = async (email: string, name: string, role: Role) => {
-  try {
-    // ...existing code...
-    return;
+
+    if (result) {
+      // Ativar o usuário após definir a senha
+      await prisma.user.update({
+        where: { email: decoded.email },
+        data: { active: true, emailVerified: true },
+      });
+    }
   } catch (error) {
     throw error;
   }

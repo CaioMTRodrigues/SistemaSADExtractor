@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUser, signIn, signUp } from "./user.service.js";
+import { createUser, firstPassword, signIn } from "./user.service.js";
 
 class UserController {
   async login(req: Request, res: Response) {
@@ -33,6 +33,16 @@ class UserController {
         return res.status(201).json(user);
     } catch (error) {
         return res.status(500).json({ message: "Error creating user", error: error });
+    }
+  }
+
+  async firstPassword(req: Request, res: Response) {
+    const { password, token } = req.body;
+    try {
+      const data = await firstPassword(password, token);
+      return res.status(200).json(data);
+    } catch (error) {
+      return res.status(500).json({ message: "Error setting first password", error: error });
     }
   }
 }
