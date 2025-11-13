@@ -8,13 +8,13 @@ type Role = "ADMIN" | "GESTOR" | "CADASTRO";
 
 export const signIn = async (email: string, password: string) => {
   try {
-    const user = auth.api.signInEmail({
+    const user = await auth.api.signInEmail({
       body: {
         email,
         password,
         callbackURL: `${FRONTEND_URL}/home`,
       },
-      asResponse: true,
+      //   asResponse: true,
     });
     return user;
   } catch (error) {

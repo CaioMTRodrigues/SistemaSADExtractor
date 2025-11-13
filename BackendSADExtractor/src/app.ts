@@ -4,7 +4,7 @@ import morgan from "morgan";
 import { FRONTEND_URL, PORT } from "./lib/env.js";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
-import userRouter from "./user/user.routes.js";
+import authRouter from "./auth/auth.routes.js";
 
 const app = express();
 const corsOptions = {
@@ -18,7 +18,7 @@ app.use(morgan("dev"));
 app.use(cors(corsOptions));
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use(express.json());
-app.use("/user", userRouter);
+app.use("/auth", authRouter);
 
 app.get("/", (req, res) => {
   res.send("SAD Extractor Backend is running");

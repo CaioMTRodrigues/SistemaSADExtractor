@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { createUser, firstPassword, signIn } from "./user.service.js";
+import { createUser, firstPassword, signIn } from "./auth.service.js";
 
-class UserController {
+class AuthController {
   async login(req: Request, res: Response) {
     const { email, password } = req.body;
 
@@ -18,11 +18,12 @@ class UserController {
       return res.status(401).json({ message: "Invalid credentials" });
     }
   }
-  async logout(req: Request, res: Response) {
 
-  }
   async register(req: Request, res: Response) {
     const { email, name, role } = req.body;
+    if(req.user.role !== "ADMIN") {
+        return res.status(403).json({ message: "Forbidden" });
+    }
     if (email === null) {
       return res
         .status(400)
@@ -47,4 +48,4 @@ class UserController {
   }
 }
 
-export default UserController;
+export default AuthController;
