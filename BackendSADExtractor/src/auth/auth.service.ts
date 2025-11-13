@@ -8,6 +8,13 @@ type Role = "ADMIN" | "GESTOR" | "CADASTRO";
 
 export const signIn = async (email: string, password: string) => {
   try {
+    // conferir se usuário está ativo
+    const userRecord = await prisma.user.findUnique({
+      where: { email: email, active: true },
+    });
+    if (!userRecord) {
+      throw new Error("User not found or inactive");
+    }
     const user = await auth.api.signInEmail({
       body: {
         email,
