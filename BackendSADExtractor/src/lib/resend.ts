@@ -16,7 +16,7 @@ const jwtToken = jwt.sign(
 
   await resend.emails.send({
     from: "no-reply@resend.dev",
-    to: email,
+    to: "samyesouza13@gmail.com",
     subject: "Seu link de acesso",
     html: `
       <p>Olá,</p>

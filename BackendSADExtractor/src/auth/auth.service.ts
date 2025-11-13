@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 import { prisma } from "../lib/db.js";
 
-type Role = "ADMIN" | "GESTOR" | "CADASTRO";
+export type Role = "ADMIN" | "GESTOR" | "CADASTRO";
 
 export const signIn = async (email: string, password: string) => {
   try {
