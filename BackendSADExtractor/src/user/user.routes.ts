@@ -8,6 +8,14 @@ const userController = new UserController();
 /**
  * Admin routes
  */
+userRouter.get("/:id", requireRole("ADMIN"), (req: Request, res: Response) => {
+    userController.getUserById(req, res);
+});
+
+userRouter.get("/", requireRole("ADMIN"), (req: Request, res: Response) => {
+    userController.getUsers(req, res);
+});
+
 userRouter.put("/:id", requireRole("ADMIN"), (req: Request, res: Response) => {
     userController.updateUser(req, res);
 });
