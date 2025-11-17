@@ -17,4 +17,9 @@ authRouter.post("/register", requireRole("ADMIN"), (req: Request, res: Response)
   authController.register(req, res);
 });
 
+// Rota para admin reenviar email de primeira senha
+authRouter.post("/resend-first-password/:id", requireRole("ADMIN"), (req: Request, res: Response) => {
+  authController.resendFirstPasswordEmail(req, res);
+});
+
 export default authRouter;

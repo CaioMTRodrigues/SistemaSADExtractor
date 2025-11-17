@@ -1,7 +1,33 @@
 import { Request, Response } from "express";
 import { createUser, firstPassword, signIn } from "./auth.service.js";
 
+import { getOneUser } from "../user/user.service.js";
+import { auth } from "../lib/auth.js";
 class AuthController {
+  /**
+   * Admin reenvia email de criação de senha para o usuário
+   */
+  async resendFirstPasswordEmail(req: Request, res: Response) {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    try {
+      const user = await getOneUser(id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      await auth.api.requestPasswordReset({
+        body: {
+          email: user.email,
+          redirectTo: "/create-password",
+        },
+      });
+      return res.status(200).json({ message: "Email de criação de senha reenviado com sucesso." });
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao reenviar email de criação de senha", error });
+    }
+  }
   async login(req: Request, res: Response) {
     const { email, password } = req.body;
 
