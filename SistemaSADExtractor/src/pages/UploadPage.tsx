@@ -4,13 +4,16 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Stepper from "../components/Stepper";
 import UploadDropzone from "../components/UploadDropzone";
-import styles from "./HomePage.module.css";
-import govPeBadge from "../assets/gov-pe-badge.png";
+import styles from "./UploadPage.module.css";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
 type UIFile = { file: File; id: string };
 
-const HomePage: React.FC = () => {
+const UploadPage: React.FC = () => {
   const [files, setFiles] = useState<UIFile[]>([]);
+  const navigateEdit = useNavigate();
+  const userType = useAuthStore((s) => s.userType);
 
   function addFiles(newOnes: File[]) {
     setFiles((prev) => [
@@ -18,47 +21,56 @@ const HomePage: React.FC = () => {
       ...newOnes.map((f) => ({ file: f, id: crypto.randomUUID() })),
     ]);
   }
+
   function removeFile(id: string) {
     setFiles((prev) => prev.filter((f) => f.id !== id));
   }
+
   function clearAll() {
     setFiles([]);
   }
 
-  // Stepper: etapa 1 (Upload). subprogress 0..1 = 1 quando já tem arquivo.
   const stepCurrent = 1;
   const stepSub = files.length > 0 ? 1 : 0;
 
-  const items = useMemo(
-    () => [
-      { label: "Upload de documentos", href: "#", active: true },
-      { label: "Editar dados", href: "#" },
-      { label: "Histórico de Laudos", href: "#" },
-    ],
-    []
-  );
+  const navbarItems = useMemo(() => {
+  const base = [
+    { label: "Upload de Documentos", href: `/${userType}/upload` },
+    { label: "Editar Dados", href: `/${userType}/edit` },
+    { label: "Exportar", href: `/${userType}/exportar` },
+    { label: "Histórico de Laudos", href: `/${userType}/historico` },
+  ];
+
+
+  if (userType === "gestor" || userType === "admin") {
+    base.push(
+      { label: "Histórico de Usuários", href: `/${userType}/historico-usuarios` },
+      { label: "Indicadores", href: `/${userType}/indicadores` }
+    );
+  }
+
+
+  if (userType === "admin") {
+    base.push({
+      label: "Configurações",
+      href: `/${userType}/configuracoes`,
+    });
+  }
+
+  return base;
+}, [userType]);
+
 
   function carregarDados() {
-    // TODO: chamar backend p/ processar
-    alert(`Carregando ${files.length} arquivo(s)...`);
+    navigateEdit(`/${userType}/edit`);
   }
 
   return (
     <div className={styles.page}>
       <Header
-        rightSlot={
-          <div className={styles.govRight}>
-            <div className={styles.govText}>
-              <span>Secretaria</span>
-              <span className={styles.govTextLine}>de Administração</span>
-            </div>
-            <img src={govPeBadge} alt="Governo de Pernambuco" className={styles.govBadge}/>
-          </div>
-        }
       />
 
-      {/* navbar com menu + usuário na mesma barra */}
-      <Navbar items={items} userName="Nome de usuário" />
+      <Navbar items={navbarItems} userName="Nome de usuário" />
 
       <main className={styles.main}>
         <div className={styles.container}>
@@ -74,7 +86,6 @@ const HomePage: React.FC = () => {
 
             <UploadDropzone onFiles={addFiles} />
 
-            {/* Lista de arquivos */}
             {files.length > 0 && (
               <div className={styles.fileList}>
                 <div className={styles.fileListTitle}>Nomes dos arquivos</div>
@@ -110,4 +121,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default UploadPage;
