@@ -1,0 +1,202 @@
+.page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  padding: 32px 0;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-top: 28px;
+}
+
+.cardHeader {
+  margin-bottom: 20px;
+}
+
+.cardTitle {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #1e293b;
+}
+
+.cardSub {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.tableWrap {
+  margin-top: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tableHeader {
+  background: #f8fafc;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tableTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.table {
+  width: 100%;
+}
+
+.tr {
+  display: grid;
+  grid-template-columns: 60px 70px 1fr 130px 60px 150px 150px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  align-items: center;
+  background: white;
+}
+
+.thead {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+.th, .td {
+  font-size: 14px;
+  color: #334155;
+}
+
+.center {
+  text-align: center;
+}
+
+.actionCell {
+  display: flex;
+  justify-content: center;
+}
+
+.actionGo {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.fileLink {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+.fileLink:hover {
+  text-decoration: underline;
+}
+
+.tableFooter {
+  padding: 10px 16px;
+  background: #f8fafc;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+}
+.linkBtn:hover {
+  text-decoration: underline;
+}
+
+.bottomBar {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selectedPill {
+  background: #e2e8f0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.exportBox {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.select {
+  border: 1px solid #cbd5e1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  color: #334155;
+}
+.select:focus {
+  outline: 2px solid #2563eb;
+}
+
+.btnPrimary {
+  padding: 10px 20px;
+  background: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btnPrimary:hover {
+  background: #1e40af;
+}
+.btnPrimary:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
+
+.govRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.govText {
+  text-align: right;
+  font-size: 14px;
+  color: white;
+  line-height: 1.1;
+}
+
+.govTextLine {
+  font-weight: 700;
+}
+
+.govBadge {
+  height: 40px;
+}

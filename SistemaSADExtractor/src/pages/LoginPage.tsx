@@ -2,51 +2,43 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import styles from "./LoginPage.module.css";
-
-/* Se o SVG estiver em src/assets */
-import govPeBadge from "../assets/gov-pe-badge.png";
-
-/* Se preferir em public/, troque por:
-   <img src="/gov-pe-badge.svg" ... />
-*/
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const emails = [
-    { label: "Selecionar", value: "" },
-    { label: "usuario@pe.gov.br", value: "usuario@pe.gov.br" },
-    { label: "admin@pe.gov.br", value: "admin@pe.gov.br" },
-  ];
+  const tipos = [
+  { label: "cadastro@sad.pe.gov.br" },
+  { label: "gestor@sad.pe.gov.br" },
+  { label: "admin@sad.pe.gov.br" },
+];
+
+  const navigate = useNavigate();
+  const setUserType = useAuthStore((s) => s.setUserType);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsSubmitting(true);
-    // TODO: integrar com API real
+
+    let tipo: "cadastro" | "gestor" | "admin" | "" = "";
+    if (email === "cadastro@sad.pe.gov.br") tipo = "cadastro";
+    if (email === "gestor@sad.pe.gov.br") tipo = "gestor";
+    if (email === "admin@sad.pe.gov.br") tipo = "admin";
+
+    setUserType(tipo);
+
     setTimeout(() => {
       setIsSubmitting(false);
-      alert("Login simulado 😄");
+      navigate(`/${tipo}/upload`);
     }, 600);
   }
 
   return (
     <div className={styles.page}>
       <Header
-        rightSlot={
-          <div className={styles.govRight}>
-            <div className={styles.govText}>
-              <span>Secretaria</span>
-              <span className={styles.govTextLine}>de Administração</span>
-            </div>
-            <img
-              src={govPeBadge}
-              alt="Governo de Pernambuco"
-              className={styles.govBadge}
-            />
-          </div>
-        }
       />
 
       <main className={styles.main}>
@@ -56,22 +48,19 @@ const LoginPage: React.FC = () => {
             <div className={styles.separator} />
 
             <form className={styles.form} onSubmit={onSubmit}>
-              {/* E-mail */}
               <div className={styles.field}>
-                <label htmlFor="email" className={styles.label}>
-                  E-mail
-                </label>
+                <label className={styles.label}>Tipo de usuário</label>
                 <div className={styles.selectWrap}>
                   <select
-                    id="email"
                     className={styles.select}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   >
-                    {emails.map((opt) => (
-                      <option key={opt.label} value={opt.value}>
-                        {opt.label}
+                    <option value="">Selecionar</option>
+                    {tipos.map((t) => (
+                      <option key={t.label} value={t.label}>
+                        {t.label}
                       </option>
                     ))}
                   </select>
@@ -79,7 +68,6 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Senha */}
               <div className={styles.field}>
                 <label htmlFor="senha" className={styles.label}>
                   Senha
@@ -96,7 +84,6 @@ const LoginPage: React.FC = () => {
                 />
               </div>
 
-              {/* Ações */}
               <button
                 type="submit"
                 disabled={isSubmitting || !email || !senha}
@@ -123,7 +110,6 @@ const LoginPage: React.FC = () => {
 
 export default LoginPage;
 
-/* ícone do dropdown */
 function ChevronDown(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" {...props}>
