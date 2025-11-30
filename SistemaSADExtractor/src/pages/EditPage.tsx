@@ -1,40 +1,41 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Stepper from "../components/Stepper";
 import ConfidenceBar from "../components/ConfidenceBar";
 import styles from "./EditPage.module.css";
-import govPeBadge from "@/assets/gov-pe-badge.png";
 import clsx from "clsx";
+import { useAuthStore } from "../store/useAuthStore";
+import ConfirmValidateModal from "../components/ConfirmValidateModal";
+import { useNavigate } from "react-router-dom";
 
-/** Tipo de linha da tabela */
 type Row = {
   id: number;
   name: string;
-  extracted: number; // dados extraídos
-  total: number;     // total esperado
-  confidence: number; // 0..100
+  extracted: number;
+  total: number;
+  confidence: number;
   action: "revisar" | "prosseguir" | "descartado";
   checked?: boolean;
-  error?: boolean;    // para destacar linha em vermelho
+  error?: boolean;
 };
 
-/** Mock inicial — substitua pelo seu estado vindo da etapa 1 */
 const initialRows: Row[] = [
   { id: 1, name: "Laudo_xxx.pdf", extracted: 12, total: 30, confidence: 40, action: "revisar" },
   { id: 2, name: "Laudo_xxx.pdf", extracted: 30, total: 30, confidence: 100, action: "prosseguir", checked: true },
   { id: 3, name: "Laudo_xxx.pdf", extracted: 21, total: 30, confidence: 70, action: "prosseguir", checked: true },
-  { id: 4, name: "Laudo_xxx.pdf", extracted: 3,  total: 30, confidence: 10, action: "descartado", error: true },
+  { id: 4, name: "Laudo_xxx.pdf", extracted: 3, total: 30, confidence: 10, action: "descartado", error: true },
 ];
 
 export default function EditPage() {
-  // paginação simples
+  const [modalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(4);
-
-  // estado da tabela
   const [rows, setRows] = useState<Row[]>(initialRows);
+
+  const navigate = useNavigate();
+  const userType = useAuthStore((s) => s.userType);
 
   const totalPages = Math.max(1, Math.ceil(rows.length / perPage));
   const pageRows = useMemo(() => {
@@ -46,7 +47,7 @@ export default function EditPage() {
   const selectedCount = rows.filter(r => r.checked).length;
 
   function toggleRow(id: number, checked: boolean) {
-    setRows(prev => prev.map(r => r.id === id ? { ...r, checked } : r));
+    setRows(prev => prev.map(r => (r.id === id ? { ...r, checked } : r)));
   }
 
   function toggleAll(checked: boolean) {
@@ -63,7 +64,6 @@ export default function EditPage() {
 
   function validateSelected() {
     if (!selectedCount) return;
-    // TODO: enviar para API de validação
     alert(`${selectedCount} laudo(s) enviados para validação.`);
   }
 
@@ -71,27 +71,37 @@ export default function EditPage() {
     return Math.round((r.extracted / r.total) * 100);
   }
 
-  const navbarItems = useMemo(
-    () => [
-      { label: "Upload de documentos", href: "#upload" },
-      { label: "Editar dados", href: "#", active: true },
-      { label: "Histórico de Laudos", href: "#historico" },
-    ],
-    []
-  );
+  const navbarItems = useMemo(() => {
+    const base = [
+      { label: "Upload de Documentos", href: `/${userType}/upload` },
+      { label: "Editar Dados", href: `/${userType}/edit` },
+      { label: "Exportar", href: `/${userType}/exportar` },
+      { label: "Histórico de Laudos", href: `/${userType}/historico` },
+    ];
+  
+  
+    if (userType === "gestor" || userType === "admin") {
+      base.push(
+        { label: "Histórico de Usuários", href: `/${userType}/historico-usuarios` },
+        { label: "Indicadores", href: `/${userType}/indicadores` }
+      );
+    }
+  
+  
+    if (userType === "admin") {
+      base.push({
+        label: "Configurações",
+        href: `/${userType}/configuracoes`,
+      });
+    }
+  
+    return base;
+  }, [userType]);
+  
 
   return (
     <div className={styles.page}>
       <Header
-        rightSlot={
-          <div className={styles.govRight}>
-            <div className={styles.govText}>
-              <span>Secretaria</span>
-              <span className={styles.govTextLine}>de Administração</span>
-            </div>
-            <img src={govPeBadge} alt="Governo de Pernambuco" className={styles.govBadge}/>
-          </div>
-        }
       />
 
       <Navbar items={navbarItems} userName="Nome de usuário" />
@@ -103,9 +113,7 @@ export default function EditPage() {
           <section className={styles.card}>
             <header className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>Edição dos dados extraídos</h2>
-              <p className={styles.cardSub}>
-                Revise o resumo dos dados extraídos a partir dos laudos
-              </p>
+              <p className={styles.cardSub}>Revise o resumo dos dados extraídos a partir dos laudos</p>
             </header>
 
             <div className={styles.tableWrap}>
@@ -120,7 +128,6 @@ export default function EditPage() {
                       type="checkbox"
                       checked={allChecked}
                       onChange={(e) => toggleAll(e.target.checked)}
-                      aria-label="Selecionar tudo"
                     />
                   </div>
                   <div className={clsx(styles.th, styles.center)}>ID</div>
@@ -132,30 +139,19 @@ export default function EditPage() {
                 </div>
 
                 {pageRows.map((r) => (
-                  <div
-                    key={r.id}
-                    className={clsx(
-                      styles.tr,
-                      r.error && styles.rowError
-                    )}
-                  >
+                  <div key={r.id} className={clsx(styles.tr, r.error && styles.rowError)}>
                     <div className={clsx(styles.td, styles.center)}>
                       <input
                         type="checkbox"
                         checked={!!r.checked}
                         onChange={(e) => toggleRow(r.id, e.target.checked)}
-                        aria-label={`Selecionar ${r.name}`}
                       />
                     </div>
 
-                    <div className={clsx(styles.td, styles.center)}>
-                      {r.id}
-                    </div>
+                    <div className={clsx(styles.td, styles.center)}>{r.id}</div>
 
                     <div className={styles.td}>
-                      <a href="#" className={styles.fileLink}>
-                        {r.name}
-                      </a>
+                      <a href="#" className={styles.fileLink}>{r.name}</a>
                       {r.action === "descartado" && <span className={styles.badgeDanger}>!</span>}
                       {r.action === "prosseguir" && <span className={styles.badgeOk}>●</span>}
                     </div>
@@ -186,13 +182,9 @@ export default function EditPage() {
                         {r.action === "descartado" && "Descartado"}
                       </span>
 
-                      <button
-                        className={styles.trashBtn}
-                        title="Excluir"
-                        onClick={() => removeRow(r.id)}
-                      >
-                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
-                          <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm-4 0h2v9H6V9zm8 0h2v9h-2V9z" fill="#ef4444"/>
+                      <button className={styles.trashBtn} onClick={() => removeRow(r.id)}>
+                        <svg viewBox="0 0 24 24" width="18" height="18">
+                          <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm-4 0h2v9H6V9zm8 0h2v9h-2V9z" fill="#ef4444" />
                         </svg>
                       </button>
                     </div>
@@ -200,25 +192,13 @@ export default function EditPage() {
                 ))}
               </div>
 
-              {/* rodapé de seleção/ações rápidas */}
               <div className={styles.tableFooter}>
                 <div className={styles.bulkLeft}>
-                  <button
-                    className={styles.linkBtn}
-                    onClick={() => toggleAll(true)}
-                  >
-                    Selecionar tudo
-                  </button>
+                  <button className={styles.linkBtn} onClick={() => toggleAll(true)}>Selecionar tudo</button>
                   <span className={styles.sep}>|</span>
-                  <button
-                    className={styles.linkBtn}
-                    onClick={() => toggleAll(false)}
-                  >
-                    Excluir tudo
-                  </button>
+                  <button className={styles.linkBtn} onClick={() => toggleAll(false)}>Desselecionar todos</button>
                 </div>
 
-                {/* Paginação */}
                 <div className={styles.pagination}>
                   <label className={styles.itemsLabel}>
                     Itens por página
@@ -237,23 +217,17 @@ export default function EditPage() {
                   </label>
 
                   <span className={styles.pageInfo}>
-                    {rows.length ? `${(page - 1) * perPage + 1}-${Math.min(page * perPage, rows.length)} de ${rows.length}` : "0 de 0"}
+                    {rows.length
+                      ? `${(page - 1) * perPage + 1}-${Math.min(page * perPage, rows.length)} de ${rows.length}`
+                      : "0 de 0"}
                   </span>
 
                   <div className={styles.pager}>
-                    <button
-                      className={styles.pagerBtn}
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1}
-                    >
+                    <button className={styles.pagerBtn} onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
                       ‹
                     </button>
                     <span className={styles.pageNumber}>{page}</span>
-                    <button
-                      className={styles.pagerBtn}
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={page === totalPages}
-                    >
+                    <button className={styles.pagerBtn} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
                       ›
                     </button>
                   </div>
@@ -261,25 +235,16 @@ export default function EditPage() {
               </div>
             </div>
 
-            {/* barra inferior de ações */}
             <div className={styles.bottomBar}>
               <div className={styles.selectedPill}>
                 {selectedCount} laudo{selectedCount === 1 ? "" : "s"} selecionado{selectedCount === 1 ? "" : "s"}
               </div>
 
               <div className={styles.bottomActions}>
-                <button
-                  className={styles.btnGhost}
-                  onClick={removeSelected}
-                  disabled={!selectedCount}
-                >
+                <button className={styles.btnGhost} onClick={removeSelected} disabled={!selectedCount}>
                   Remover selecionados
                 </button>
-                <button
-                  className={styles.btnPrimary}
-                  onClick={validateSelected}
-                  disabled={!selectedCount}
-                >
+                <button className={styles.btnPrimary} onClick={() => setModalOpen(true)} disabled={!selectedCount}>
                   Validar Dados
                 </button>
               </div>
@@ -287,6 +252,16 @@ export default function EditPage() {
           </section>
         </div>
       </main>
+
+      <ConfirmValidateModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={() => {
+          setModalOpen(false);
+          validateSelected();
+          navigate(`/${userType}/exportar`);
+        }}
+      />
 
       <Footer year={2025} />
     </div>

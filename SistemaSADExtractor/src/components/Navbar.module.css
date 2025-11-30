@@ -1,4 +1,8 @@
-.nav { background: #0a4fbf; color: #fff; }
+.nav {
+  background: #0a4fbf;
+  color: #fff;
+}
+
 .inner {
   max-width: 1120px;
   margin: 0 auto;
@@ -8,24 +12,101 @@
   align-items: center;
   gap: 12px;
 }
-.menu { display: flex; gap: 8px; align-items: center; white-space: nowrap; overflow-x: auto; }
-.link { color: #dbeafe; text-decoration: none; font-weight: 700; font-size: 14px; }
-.link:hover { text-decoration: underline; }
-.active { color: #ffffff; }
-.sep { color: #c7d2fe; opacity: .7; }
 
-.rightBadge { color: #fff; opacity: .9; }
+.menu {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+  overflow-x: auto;
+}
 
-.user { justify-self: end; display: flex; align-items: center; gap: 8px; }
-.greet { font-size: 14px; }
+.link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  color: #dbeafe;
+  text-decoration: none;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+  color: #ffffff;
+}
+
+.active {
+  color: #ffffff;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.sep {
+  color: #c7d2fe;
+  opacity: 0.7;
+}
+
+.rightBadge {
+  color: #fff;
+  opacity: 0.9;
+}
+
+.user {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.greet {
+  font-size: 14px;
+}
+
 .profileBtn {
-  display: flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
-  color: #fff; padding: 4px 6px 4px 4px; border-radius: 999px; cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  color: #fff;
+  padding: 4px 6px 4px 4px;
+  border-radius: 999px;
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
 }
-.profileBtn:hover { filter: brightness(1.05); }
+
+.profileBtn:hover {
+  filter: brightness(1.05);
+}
+
 .avatar {
-  width: 28px; height: 28px; border-radius: 999px; background: #fff; color: #0E5BD7;
-  font-weight: 800; display: grid; place-items: center; font-size: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+
+  background: #fff;
+  color: #0E5BD7;
+  font-weight: 800;
+
+  display: grid;
+  place-items: center;
+  font-size: 12px;
 }
-.chev { width: 14px; height: 14px; opacity: .9; }
+
+.chev {
+  width: 14px;
+  height: 14px;
+  opacity: 0.9;
+}

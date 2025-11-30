@@ -1,55 +1,45 @@
 import React from "react";
 import styles from "./Navbar.module.css";
 import clsx from "clsx";
+import { useNavigate } from "react-router-dom";
 
-type Item = { label: string; href?: string; active?: boolean };
+type Item = { label: string; href: string; active?: boolean };
 
 type Props = {
   items?: Item[];
   userName?: string;
-  rightBadge?: React.ReactNode; // se quiser colocar algo entre o menu e o usuário
   className?: string;
 };
 
-const defaultItems: Item[] = [
-  { label: "Upload de documentos", href: "#", active: true },
-  { label: "Editar dados", href: "#" },
-  { label: "Histórico de Laudos", href: "#" },
-];
+export default function Navbar({ items = [], userName = "Nome de usuário", className }: Props) {
+  const navigate = useNavigate();
 
-const Navbar: React.FC<Props> = ({
-  items = defaultItems,
-  userName = "Nome de usuário",
-  rightBadge,
-  className,
-}) => {
+  function go(href: string) {
+    if (href && href !== "#") navigate(href);
+  }
+
   return (
     <nav className={clsx(styles.nav, className)}>
       <div className={styles.inner}>
-        {/* menu esquerdo */}
         <div className={styles.menu}>
           {items.map((it, i) => (
-            <React.Fragment key={it.label}>
-              <a
-                href={it.href}
+            <React.Fragment key={i}>
+              <button
+                onClick={() => go(it.href)}
                 className={clsx(styles.link, it.active && styles.active)}
               >
                 {it.label}
-              </a>
+              </button>
               {i < items.length - 1 && <span className={styles.sep}>|</span>}
             </React.Fragment>
           ))}
         </div>
 
-        {/* (opcional) algo no meio */}
-        {rightBadge && <div className={styles.rightBadge}>{rightBadge}</div>}
-
-        {/* usuário à direita (mesma barra) */}
         <div className={styles.user}>
           <span className={styles.greet}>
             Olá, <strong>{userName}</strong>
           </span>
-          <button className={styles.profileBtn} title="Abrir menu de usuário">
+          <div className={styles.profileBtn}>
             <div className={styles.avatar}>TT</div>
             <svg viewBox="0 0 20 20" fill="currentColor" className={styles.chev}>
               <path
@@ -58,11 +48,9 @@ const Navbar: React.FC<Props> = ({
                 clipRule="evenodd"
               />
             </svg>
-          </button>
+          </div>
         </div>
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

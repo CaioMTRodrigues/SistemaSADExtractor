@@ -1,0 +1,103 @@
+.page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  padding: 32px 0;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-top: 28px;
+}
+
+.cardHeader {
+  margin-bottom: 20px;
+}
+
+.cardTitle {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #1e293b;
+}
+
+.cardSub {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.tableWrap {
+  margin-top: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tableHeader {
+  background: #f8fafc;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tableTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.table {
+  width: 100%;
+}
+
+.tr {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 160px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  align-items: center;
+}
+
+.thead {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+.th, .td {
+  font-size: 14px;
+  color: #334155;
+}
+
+.govRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.govText {
+  text-align: right;
+  font-size: 14px;
+  color: white;
+  line-height: 1.1;
+}
+
+.govTextLine {
+  font-weight: 700;
+}
+
+.govBadge {
+  height: 40px;
+}
