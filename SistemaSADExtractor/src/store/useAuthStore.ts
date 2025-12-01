@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type AuthState = {
+export type AuthState = {
   userType: "" | "cadastro" | "gestor" | "admin";
   setUserType: (type: AuthState["userType"]) => void;
 };

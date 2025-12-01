@@ -7,7 +7,7 @@ import HistoricoPage from "./pages/HistoricoPage";
 import HistoricoUsuariosPage from "./pages/HistoricoUsuariosPage";
 import IndicadoresPage from "./pages/IndicadoresPage";
 import ConfiguracoesPage from "./pages/ConfiguracoesPage";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -15,26 +15,28 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
 
-        <Route path="/cadastro/upload" element={<UploadPage />} />
-        <Route path="/cadastro/edit" element={<EditPage />} />
-        <Route path="/cadastro/exportar" element={<ExportarPage />} />
-        <Route path="/cadastro/historico" element={<HistoricoPage />} />
+        {/* Cadastro rotas */}
+        <Route path="/cadastro/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
+        <Route path="/cadastro/edit" element={<ProtectedRoute><EditPage /></ProtectedRoute>} />
+        <Route path="/cadastro/exportar" element={<ProtectedRoute><ExportarPage /></ProtectedRoute>} />
+        <Route path="/cadastro/historico" element={<ProtectedRoute><HistoricoPage /></ProtectedRoute>} />
 
-        <Route path="/gestor/upload" element={<UploadPage />} />
-        <Route path="/gestor/edit" element={<EditPage />} />
-        <Route path="/gestor/exportar" element={<ExportarPage />} />
-        <Route path="/gestor/historico" element={<HistoricoPage />} />
-        <Route path="/gestor/historico-usuarios" element={<HistoricoUsuariosPage />} />
-        <Route path="/gestor/indicadores" element={<IndicadoresPage />} />
-        
+        {/* Gestor rotas */}
+        <Route path="/gestor/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
+        <Route path="/gestor/edit" element={<ProtectedRoute><EditPage /></ProtectedRoute>} />
+        <Route path="/gestor/exportar" element={<ProtectedRoute><ExportarPage /></ProtectedRoute>} />
+        <Route path="/gestor/historico" element={<ProtectedRoute><HistoricoPage /></ProtectedRoute>} />
+        <Route path="/gestor/historico-usuarios" element={<ProtectedRoute><HistoricoUsuariosPage /></ProtectedRoute>} />
+        <Route path="/gestor/indicadores" element={<ProtectedRoute><IndicadoresPage /></ProtectedRoute>} />
 
-        <Route path="/admin/upload" element={<UploadPage />} />
-        <Route path="/admin/edit" element={<EditPage />} />
-        <Route path="/admin/exportar" element={<ExportarPage />} />
-        <Route path="/admin/historico" element={<HistoricoPage />} />
-        <Route path="/admin/historico-usuarios" element={<HistoricoUsuariosPage />} />
-        <Route path="/admin/indicadores" element={<IndicadoresPage />} />
-        <Route path="/admin/configuracoes" element={<ConfiguracoesPage/>} />
+        {/* Admin rotas */}
+        <Route path="/admin/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
+        <Route path="/admin/edit" element={<ProtectedRoute><EditPage /></ProtectedRoute>} />
+        <Route path="/admin/exportar" element={<ProtectedRoute><ExportarPage /></ProtectedRoute>} />
+        <Route path="/admin/historico" element={<ProtectedRoute><HistoricoPage /></ProtectedRoute>} />
+        <Route path="/admin/historico-usuarios" element={<ProtectedRoute><HistoricoUsuariosPage /></ProtectedRoute>} />
+        <Route path="/admin/indicadores" element={<ProtectedRoute><IndicadoresPage /></ProtectedRoute>} />
+        <Route path="/admin/configuracoes" element={<ProtectedRoute><ConfiguracoesPage /></ProtectedRoute>} />
 
         <Route path="*" element={<LoginPage />} />
       </Routes>
