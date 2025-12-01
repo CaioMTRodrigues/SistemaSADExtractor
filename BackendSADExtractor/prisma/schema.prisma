@@ -33,7 +33,9 @@ model User {
   sessions         Session[]
   accounts         Account[]
   laudos           Laudo[]
-  historicoEdicaos HistoricoEdicao[] @relation("UserHistoricoEdicao")
+  historicoEdicoes HistoricoEdicao[] @relation("UserHistoricoEdicao")
+  extracaos        Extracao[]
+  exportacaos      Exportacao[]
 
   @@unique([email])
   @@map("user")
@@ -44,23 +46,49 @@ model Laudo {
   userId             String
   nome_arquivo       String
   qtd_campo_extraido Int
-  confiabilidade     Float
   arquivo            String?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @default(now()) @updatedAt
   user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  historicoEdicaos   HistoricoEdicao[] @relation("LaudoHistoricoEdicao")
+  historicoEdicoes   HistoricoEdicao[] @relation("LaudoHistoricoEdicao")
+  extracaos          Extracao[]
 }
 
 model HistoricoEdicao {
   id            String   @id @default(cuid())
   userId        String
   laudoId       String
+  extracaoId    String
   campo_editado String
   acao          String
   data_acao     DateTime @default(now())
   laudo         Laudo    @relation("LaudoHistoricoEdicao", fields: [laudoId], references: [id], onDelete: Cascade)
   user          User     @relation("UserHistoricoEdicao", fields: [userId], references: [id], onDelete: Cascade)
+  extracao      Extracao @relation(fields: [extracaoId, laudoId], references: [id, laudoId], onDelete: Cascade)
+}
+
+model Extracao {
+  id             String  @default(cuid())
+  laudoId        String
+  userId         String
+  nome_campo     String
+  valor_extraido String
+  valor_editado  String?
+  confiabilidade Float
+  laudo          Laudo   @relation(fields: [laudoId], references: [id], onDelete: Cascade)
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  historicoEdicoes HistoricoEdicao[]
+
+  @@id([id, laudoId])
+}
+
+model Exportacao {
+  id              String   @id @default(cuid())
+  userId          String
+  formato_arquivo String
+  data_exportacao DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Session {

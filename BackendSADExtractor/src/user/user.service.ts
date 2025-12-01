@@ -83,7 +83,7 @@ export const createLaudo = async (laudoData: {
   } catch (error) {
     throw new Error("Error creating laudo: " + error);
   }
-}
+};
 
 export const deleteLaudo = async (laudoId: string) => {
   try {
@@ -93,5 +93,36 @@ export const deleteLaudo = async (laudoId: string) => {
     return deletedLaudo;
   } catch (error) {
     throw new Error("Error deleting laudo: " + error);
+  }
+};
+
+export const createExtracao = async (extracaoData: {
+  userId: string;
+  laudoId: string;
+  nome_campo: string;
+  valor_extraido: string;
+  confiabilidade: number;
+}) => {
+  try {
+    const newExtracao = await prisma.extracao.create({
+      data: extracaoData,
+    });
+    return newExtracao;
+  } catch (error) {
+    throw new Error("Error creating extracao: " + error);
+  }
+};
+
+export const createExportacao = async (exportacaoData: {
+  userId: string;
+  formato_arquivo: string;
+}) => {
+  try {
+    const newExportacao = await prisma.exportacao.create({
+      data: exportacaoData,
+    });
+    return newExportacao;
+  } catch (error) {
+    throw new Error("Error creating exportacao: " + error);
   }
 };

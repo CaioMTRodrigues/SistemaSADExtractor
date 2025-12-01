@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import {
+  createExportacao,
+  createExtracao,
   createLaudo,
   deleteLaudo,
   getAllUsers,
@@ -111,7 +113,7 @@ class UserController {
    */
   async createLaudo(req: Request, res: Response) {
     const laudoData = req.body;
-    if (!laudoData.userId){
+    if (!laudoData.userId) {
       return res.status(400).json({ message: "User ID is required" });
     }
     try {
@@ -140,6 +142,44 @@ class UserController {
         .json({ message: "Laudo deleted successfully", result });
     } catch (error) {
       return res.status(500).json({ message: "Error deleting laudo", error });
+    }
+  }
+
+  async createExtracao(req: Request, res: Response) {
+    const extracaoData = req.body;
+    if (!extracaoData.userId || !extracaoData.laudoId) {
+      return res
+        .status(400)
+        .json({ message: "User ID and Laudo ID are required" });
+    }
+    try {
+      const extracao = await createExtracao(extracaoData);
+      return res.status(201).json({
+        message: "Extracao created successfully",
+        extracao,
+      });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Error creating extracao", error });
+    }
+  }
+
+  async createExportacao(req: Request, res: Response) {
+    const exportacaoData = req.body;
+    if (!exportacaoData.userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    try {
+      const exportacao = await createExportacao(exportacaoData);
+      return res.status(201).json({
+        message: "Exportacao created successfully",
+        exportacao,
+      });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Error creating exportacao", error });
     }
   }
 }

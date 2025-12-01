@@ -43,4 +43,13 @@ userRouter.post("/laudo", requireRole("CADASTRO", "GESTOR", "ADMIN"), (req: Requ
 userRouter.delete("/laudo/:id", requireRole("CADASTRO", "GESTOR", "ADMIN"), (req: Request, res: Response) => {
     userController.deleteLaudo(req, res);
 });
+
+userRouter.post("/extracao", requireRole("CADASTRO", "GESTOR", "ADMIN"), (req: Request, res: Response) => {
+    userController.createExtracao(req, res);
+});
+
+userRouter.post("/exportacao", requireRole("CADASTRO", "GESTOR", "ADMIN"), (req: Request, res: Response) => {
+    userController.createExportacao(req, res);
+});
+
 export default userRouter;
