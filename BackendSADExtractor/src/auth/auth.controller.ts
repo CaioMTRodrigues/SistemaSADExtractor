@@ -29,16 +29,15 @@ class AuthController {
     }
   }
   async login(req: Request, res: Response) {
-    const { email, password } = req.body;
+    const { email, senha } = req.body;
 
-    if (email === null || password === null) {
+    if (email === null || senha === null) {
       return res
         .status(400)
         .json({ message: "Email and password are required" });
     }
-
     try {
-      const user = await signIn(email, password);
+      const user = await signIn(email, senha);
       return res.status(200).json(user);
     } catch (error) {
       if (typeof error === "object" && error !== null && "message" in error) {

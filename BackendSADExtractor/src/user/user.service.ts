@@ -72,7 +72,6 @@ export const createLaudo = async (laudoData: {
   userId: string;
   nome_arquivo: string;
   qtd_campo_extraido: number;
-  confiabilidade: number;
   arquivo: string | null;
 }) => {
   try {

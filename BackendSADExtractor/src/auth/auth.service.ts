@@ -11,6 +11,7 @@ export const signIn = async (email: string, password: string) => {
     // conferir se usuário está ativo
     const userRecord = await prisma.user.findUnique({
       where: { email: email, active: true },
+      select: { role: true },
     });
     if (!userRecord) {
       throw new Error("User not found or inactive");
@@ -19,12 +20,12 @@ export const signIn = async (email: string, password: string) => {
       body: {
         email,
         password,
-        callbackURL: `${FRONTEND_URL}/home`,
       },
       //   asResponse: true,
     });
-    return user;
+    return { ...user, role: userRecord.role };
   } catch (error) {
+    console.log("Error during signIn:", error);
     throw error;
   }
 };
