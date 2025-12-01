@@ -25,7 +25,7 @@ export const signIn = async (email: string, password: string) => {
     });
     return { ...user, role: userRecord.role };
   } catch (error) {
-    console.log("Error during signIn:", error);
+    console.error("Error during signIn:", error);
     throw error;
   }
 };
