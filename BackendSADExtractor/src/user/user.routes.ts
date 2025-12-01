@@ -31,4 +31,16 @@ userRouter.delete("/:id", requireRole("ADMIN"), (req: Request, res: Response) =>
 userRouter.get("/historico-edicoes", requireRole("GESTOR", "ADMIN"), (req: Request, res: Response) => {
     userController.getEdicoes(req, res);
 });
+
+/**
+ * Cadastro routes
+ */
+
+userRouter.post("/laudo", requireRole("CADASTRO", "GESTOR", "ADMIN"), (req: Request, res: Response) => {
+    userController.createLaudo(req, res);
+});
+
+userRouter.delete("/laudo/:id", requireRole("CADASTRO", "GESTOR", "ADMIN"), (req: Request, res: Response) => {
+    userController.deleteLaudo(req, res);
+});
 export default userRouter;

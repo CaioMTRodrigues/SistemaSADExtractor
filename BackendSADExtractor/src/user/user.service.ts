@@ -1,4 +1,3 @@
-import { get } from "node:http";
 import { Role } from "../auth/auth.service.js";
 import { prisma } from "../lib/db.js";
 
@@ -66,5 +65,33 @@ export const getEdicoes = async () => {
     return edicoes;
   } catch (error) {
     throw new Error("Error retrieving edicoes: " + error);
+  }
+};
+
+export const createLaudo = async (laudoData: {
+  userId: string;
+  nome_arquivo: string;
+  qtd_campo_extraido: number;
+  confiabilidade: number;
+  arquivo: string | null;
+}) => {
+  try {
+    const newLaudo = await prisma.laudo.create({
+      data: laudoData,
+    });
+    return newLaudo;
+  } catch (error) {
+    throw new Error("Error creating laudo: " + error);
+  }
+}
+
+export const deleteLaudo = async (laudoId: string) => {
+  try {
+    const deletedLaudo = await prisma.laudo.delete({
+      where: { id: laudoId },
+    });
+    return deletedLaudo;
+  } catch (error) {
+    throw new Error("Error deleting laudo: " + error);
   }
 };

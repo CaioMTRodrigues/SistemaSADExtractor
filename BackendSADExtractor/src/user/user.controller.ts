@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import {
+  createLaudo,
+  deleteLaudo,
   getAllUsers,
   getEdicoes,
   getOneUser,
@@ -101,6 +103,43 @@ class UserController {
       return res
         .status(500)
         .json({ message: "Error retrieving edicoes", error });
+    }
+  }
+
+  /**
+   * Cadastro features
+   */
+  async createLaudo(req: Request, res: Response) {
+    const laudoData = req.body;
+    if (!laudoData.userId){
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    try {
+      const laudo = await createLaudo(laudoData);
+      return res.status(201).json({
+        message: "Laudo created successfully",
+        laudo,
+      });
+    } catch (error) {
+      return res.status(500).json({ message: "Error creating laudo", error });
+    }
+  }
+
+  async deleteLaudo(req: Request, res: Response) {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "Laudo ID is required" });
+    }
+    try {
+      const result = await deleteLaudo(id);
+      if (!result) {
+        return res.status(404).json({ message: "Laudo not found" });
+      }
+      return res
+        .status(200)
+        .json({ message: "Laudo deleted successfully", result });
+    } catch (error) {
+      return res.status(500).json({ message: "Error deleting laudo", error });
     }
   }
 }
