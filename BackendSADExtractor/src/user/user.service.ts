@@ -1,25 +1,29 @@
+import { get } from "node:http";
 import { Role } from "../auth/auth.service.js";
 import { prisma } from "../lib/db.js";
 
 export const getOneUser = async (userId: string) => {
   return prisma.user.findUnique({
     where: { id: userId, active: true },
-    select:{
+    select: {
       id: true,
       email: true,
       name: true,
       role: true,
-    }
+    },
   });
-}
+};
 
-export const getAllUsers = async (pagination?: { skip?: number; take?: number }) => {
+export const getAllUsers = async (pagination?: {
+  skip?: number;
+  take?: number;
+}) => {
   return prisma.user.findMany({
     where: { active: true },
     skip: pagination?.skip,
     take: pagination?.take,
   });
-}
+};
 
 export const inactivateUser = async (userId: string) => {
   //verificar se usuario existe e está ativo
@@ -52,4 +56,15 @@ export const updateUser = async (
       ...updatedUser,
     },
   });
+};
+
+export const getEdicoes = async () => {
+  try {
+    const edicoes = await prisma.historicoEdicao.findMany({
+      orderBy: { data_acao: "desc" },
+    });
+    return edicoes;
+  } catch (error) {
+    throw new Error("Error retrieving edicoes: " + error);
+  }
 };

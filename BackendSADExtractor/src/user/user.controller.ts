@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
-import { getAllUsers, getOneUser, inactivateUser, updateUser } from "./user.service.js";
+import {
+  getAllUsers,
+  getEdicoes,
+  getOneUser,
+  inactivateUser,
+  updateUser,
+} from "./user.service.js";
 
 class UserController {
   /**
@@ -80,6 +86,21 @@ class UserController {
       return res
         .status(500)
         .json({ message: "Error inactivating user", error });
+    }
+  }
+
+  /**
+   * Gestor features
+   */
+  async getEdicoes(req: Request, res: Response) {
+    // Implementar lógica para obter laudos
+    try {
+      const edicoes = await getEdicoes();
+      return res.status(200).json(edicoes);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Error retrieving edicoes", error });
     }
   }
 }

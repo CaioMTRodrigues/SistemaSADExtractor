@@ -23,4 +23,12 @@ userRouter.put("/:id", requireRole("ADMIN"), (req: Request, res: Response) => {
 userRouter.delete("/:id", requireRole("ADMIN"), (req: Request, res: Response) => {
     userController.deleteUser(req, res);
 });
+
+/**
+ * Gestor routes
+ */
+
+userRouter.get("/historico-edicoes", requireRole("GESTOR", "ADMIN"), (req: Request, res: Response) => {
+    userController.getEdicoes(req, res);
+});
 export default userRouter;
