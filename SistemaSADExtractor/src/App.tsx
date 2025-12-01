@@ -8,12 +8,14 @@ import HistoricoUsuariosPage from "./pages/HistoricoUsuariosPage";
 import IndicadoresPage from "./pages/IndicadoresPage";
 import ConfiguracoesPage from "./pages/ConfiguracoesPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CreatePasswordPage from "./pages/CriarSenhaPage";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/create-password" element={<CreatePasswordPage />} />
 
         {/* Cadastro rotas */}
         <Route path="/cadastro/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
