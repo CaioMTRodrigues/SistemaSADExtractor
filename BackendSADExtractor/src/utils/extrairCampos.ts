@@ -40,7 +40,6 @@ export type CamposLaudo = {
 export async function extrairCamposComIA(
   textoLaudo: string,
 ): Promise<CamposLaudo> {
-    console.log("Iniciando extração de campos com IA...");
   const response = await client.chat.completions.create({
     model: "tngtech/deepseek-r1t-chimera:free",
     temperature: 0.2,

@@ -59,15 +59,38 @@ export type UserDto = {
   totalAccess: number;
 };
 
+export type Laudo = {
+  id: string;
+  userId: string;
+  nome_arquivo: string;
+  qtd_campo_extraido: number;
+  confiabilidade: number | null;
+  arquivo: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 // Exemplo de função para login
 export async function login(email: string, senha: string) {
   const response = await api.post("/auth/login", { email, senha });
   return response.data;
 }
 
-export async function createLaudo(payload: CreateLaudoPayload) {
+export async function createLaudo(payload: CreateLaudoPayload): Promise<Laudo> {
   const response = await api.post("/user/laudo", payload);
-  return response.data;
+  return response.data.laudo;
+}
+
+export async function deleteLaudo(laudoId: string): Promise<void> {
+  await api.delete(`/user/laudo/${laudoId}`);
+}
+
+export async function fetchLaudosByIds(ids: string[]): Promise<Laudo[]> {
+  if (!ids.length) return [];
+  const res = await api.get<Laudo[]>("/user/laudos", {
+    params: { ids: ids.join(",") },
+  });
+  return res.data;
 }
 
 export async function fetchUsers(page: number = 1, limit: number = 5): Promise<FetchUsersResponse> {

@@ -6,6 +6,7 @@ import {
   deleteLaudo,
   getAllUsers,
   getEdicoes,
+  getLaudosByIds,
   getOneUser,
   inactivateUser,
   updateUser,
@@ -111,6 +112,20 @@ class UserController {
   /**
    * Cadastro features
    */
+  async getLaudosByIds(req: Request, res: Response) {
+    const idsParam = req.query.ids as string;
+    if (!idsParam) {
+      return res.status(400).json({ message: "Laudo IDs are required" });
+    }
+    const ids = idsParam.split(",").filter(Boolean);
+    try {
+      const laudos = await getLaudosByIds(ids);
+      return res.status(200).json(laudos);
+    } catch (error) {
+      return res.status(500).json({ message: "Error retrieving laudos", error });
+    }
+  }
+
   async createLaudo(req: Request, res: Response) {
     const laudoData = req.body;
     if (!laudoData.userId) {

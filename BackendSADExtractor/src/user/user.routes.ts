@@ -8,6 +8,10 @@ const userController = new UserController();
 /**
  * Admin routes
  */
+userRouter.get("/laudos", requireRole("CADASTRO", "GESTOR", "ADMIN"), (req: Request, res: Response) => {
+    userController.getLaudosByIds(req, res);
+});
+
 userRouter.get("/:id", requireRole("ADMIN"), (req: Request, res: Response) => {
     userController.getUserById(req, res);
 });

@@ -71,6 +71,17 @@ export const getEdicoes = async () => {
   }
 };
 
+export const getLaudosByIds = async (laudoIds: string[]) => {
+  try {
+    const laudos = await prisma.laudo.findMany({
+      where: { id: { in: laudoIds } },
+    });
+    return laudos;
+  } catch (error) {
+    throw new Error("Error retrieving laudos: " + error);
+  }
+};
+
 export const createLaudo = async (laudoData: {
   userId: string;
   nome_arquivo: string;
