@@ -89,21 +89,21 @@ const UploadPage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      await Promise.all(
-        files.map(async ({ file }) => {
-          const base64 = await fileToBase64(file);
+      // Envia os laudos SEQUENCIALMENTE
+    for (const { file } of files) {
+      const base64 = await fileToBase64(file);
 
-          await createLaudo({
-            userId,
-            nome_arquivo: file.name,
-            qtd_campo_extraido: 0,
-            arquivo: base64,
-          });
-        })
-      );
+      // só passa pro próximo arquivo depois que essa chamada terminar
+      await createLaudo({
+        userId,
+        nome_arquivo: file.name,
+        qtd_campo_extraido: 0,
+        arquivo: base64,
+      });
+    }
 
-      // se tudo deu certo, segue o fluxo para edição
-      navigateEdit(`/${userType}/edit`);
+    // se todos foram processados com sucesso, navega para edição
+    navigateEdit(`/${userType}/edit`);
     } catch (error) {
       console.error("Erro ao enviar laudos:", error);
       // tratar erro (toast, mensagem na tela, etc.)

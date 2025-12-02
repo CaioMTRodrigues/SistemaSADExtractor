@@ -4,7 +4,7 @@ import { BACKEND } from "./env";
 // Configuração geral do axios
 const api = axios.create({
   baseURL: BACKEND, // ajuste para a URL do seu backend se necessário
-  timeout: 10000,
+  timeout: 100000,
   headers: {
     "Content-Type": "application/json",
   },
