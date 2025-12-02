@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import Stepper from "../components/Stepper";
 import styles from "./ConfiguracoesPage.module.css";
 import { useAuthStore } from "../store/useAuthStore";
 import clsx from "clsx";
@@ -169,8 +168,6 @@ export default function ConfiguracoesPage() {
 
       <main className={styles.main}>
         <div className={styles.container}>
-          <Stepper current={0} subprogress={0} />
-
           <section className={styles.card}>
             <header className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>Configurações dos usuários</h2>
