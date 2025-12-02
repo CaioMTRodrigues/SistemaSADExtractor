@@ -18,7 +18,7 @@ const corsOptions = {
 app.use(morgan("dev"));
 app.use(cors(corsOptions));
 app.all("/api/auth/{*any}", toNodeHandler(auth));
-app.use(express.json({limit: "10mb"}));
+app.use(express.json({limit: "75mb"}));
 app.use("/auth", authRouter);
 app.use("/user", userRouter);
 

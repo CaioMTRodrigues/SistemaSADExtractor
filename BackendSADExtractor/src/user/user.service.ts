@@ -1,5 +1,8 @@
+import { create } from "domain";
 import { Role } from "../auth/auth.service.js";
 import { prisma } from "../lib/db.js";
+import { extrairCamposComIA } from "../utils/extrairCampos.js";
+import { decodeBase64PdfToText } from "../utils/pdfToText.js";
 
 export const getOneUser = async (userId: string) => {
   return prisma.user.findUnique({
@@ -71,13 +74,40 @@ export const getEdicoes = async () => {
 export const createLaudo = async (laudoData: {
   userId: string;
   nome_arquivo: string;
-  qtd_campo_extraido: number;
-  arquivo: string | null;
+  arquivo: string;
 }) => {
   try {
+    // 1) Cria o laudo básico
     const newLaudo = await prisma.laudo.create({
-      data: laudoData,
+      data: {...laudoData, qtd_campo_extraido: 0, confiabilidade: null},
     });
+
+    // 2) Extrai texto do PDF (se você estiver mandando PDF em base64)
+    const textoLaudo = await decodeBase64PdfToText(laudoData.arquivo);
+
+    // 3) Chama a IA para extrair campos
+    const campos = await extrairCamposComIA(textoLaudo);
+
+    // 4) Atualiza laudo + cria registro em Extracao
+    await prisma.laudo.update({
+      where: { id: newLaudo.id },
+      data: {
+        qtd_campo_extraido: Object.values(campos).filter((v) => v !== null).length,
+        confiabilidade: campos.confiabilidade,
+      },
+    });
+
+    for (const [nome_campo, valor_extraido] of Object.entries(campos)) {
+      if (valor_extraido !== null) {
+        await createExtracao({
+          userId: laudoData.userId,
+          laudoId: newLaudo.id,
+          nome_campo,
+          valor_extraido: String(valor_extraido),
+        });
+      }
+    }
+
     return newLaudo;
   } catch (error) {
     throw new Error("Error creating laudo: " + error);
@@ -100,7 +130,6 @@ export const createExtracao = async (extracaoData: {
   laudoId: string;
   nome_campo: string;
   valor_extraido: string;
-  confiabilidade: number;
 }) => {
   try {
     const newExtracao = await prisma.extracao.create({
