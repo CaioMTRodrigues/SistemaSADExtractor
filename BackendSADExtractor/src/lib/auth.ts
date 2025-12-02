@@ -1,8 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prisma } from "./db.js";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { bearer, magicLink } from "better-auth/plugins";
-import { resend, sendResetPasswordLinkEmail } from "./resend.js";
+import { bearer } from "better-auth/plugins";
+import { sendResetPasswordLinkEmail } from "./resend.js";
 import { FRONTEND_URL } from "./env.js";
 
 export const auth = betterAuth({
