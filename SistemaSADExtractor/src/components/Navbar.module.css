@@ -85,6 +85,7 @@
 
   appearance: none;
   -webkit-appearance: none;
+  position: relative;
 }
 
 .profileBtn:hover {
@@ -110,3 +111,46 @@
   height: 14px;
   opacity: 0.9;
 }
+
+.chevBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.profileMenu {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  min-width: 120px;
+  background: #fff;
+  color: #0a4fbf;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  z-index: 10;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.logoutBtn {
+  background: none;
+  border: none;
+  color: #0a4fbf;
+  font-weight: 600;
+  padding: 8px 16px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 0;
+  transition: background 0.15s;
+}
+.logoutBtn:hover {
+  background: #e0e7ff;
+}
+
