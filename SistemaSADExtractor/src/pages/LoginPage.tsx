@@ -4,18 +4,27 @@ import Footer from "../components/Footer";
 import styles from "./LoginPage.module.css";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { login } from "../lib/api";
+// Importe a nova função forgotPassword aqui
+import { login, forgotPassword } from "../lib/api"; 
 import type { AuthState } from "../store/useAuthStore";
 
 const LoginPage: React.FC = () => {
+  // Estados do Login
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // Estados do Modal de Recuperação
+  const [showModal, setShowModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetMessage, setResetMessage] = useState({ type: "", text: "" });
+
   const navigate = useNavigate();
   const setUserType = useAuthStore((s) => s.setUserType);
 
+  // Função de Login (Mantida igual a original, apenas limpando logs se quiser)
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsSubmitting(true);
@@ -23,24 +32,20 @@ const LoginPage: React.FC = () => {
     try {
       const data = await login(email, senha);
       const role: string = data.role ? data.role.toLowerCase() : "";
-      // Salva token e user no localStorage
+      
       localStorage.setItem("authToken", data.token);
       localStorage.setItem("authUser", JSON.stringify(data.user));
       localStorage.setItem("authRole", role);
 
-      // Salva role no store, se existir
       const allowedRoles = ["cadastro", "gestor", "admin"];
-      const mappedRole = allowedRoles.includes(role)
-        ? role
-        : "";
+      const mappedRole = allowedRoles.includes(role) ? role : "";
       setUserType(mappedRole as AuthState["userType"]);
-      // Redireciona apenas se role for válido
+      
       if (mappedRole) {
         navigate(`/${mappedRole}/upload`);
       } else {
         setError("Usuário sem permissão ou role inválida.");
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Login error:", err);
       if (err.response && err.response.data && err.response.data.message) {
@@ -48,9 +53,43 @@ const LoginPage: React.FC = () => {
       } else {
         setError("Erro de conexão com o servidor");
       }
-      setIsSubmitting(false);
+    } finally {
+        setIsSubmitting(false);
     }
   }
+
+  // Nova função para processar o "Esqueci minha senha"
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (!resetEmail) return;
+
+    setIsResetting(true);
+    setResetMessage({ type: "", text: "" });
+
+    try {
+      await forgotPassword(resetEmail);
+      setResetMessage({ 
+        type: "success", 
+        text: "Se o e-mail existir, um link de redefinição foi enviado!" 
+      });
+      setResetEmail(""); // Limpa o campo
+    } catch (err: any) {
+      setResetMessage({ 
+        type: "error", 
+        text: err.message || "Erro ao tentar enviar e-mail." 
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  }
+
+  // Função para abrir o modal e resetar estados
+  const openModal = (e: React.MouseEvent) => {
+    e.preventDefault(); // Evita que a âncora recarregue a página
+    setShowModal(true);
+    setResetMessage({ type: "", text: "" });
+    setResetEmail("");
+  };
 
   return (
     <div className={styles.page}>
@@ -60,6 +99,8 @@ const LoginPage: React.FC = () => {
           <div className={styles.card}>
             <h1 className={styles.cardTitle}>Extractor - Acesso</h1>
             <div className={styles.separator} />
+            
+            {/* Formulário de Login */}
             <form className={styles.form} onSubmit={onSubmit}>
               <div className={styles.field}>
                 <label htmlFor="email" className={styles.label}>Email</label>
@@ -86,7 +127,9 @@ const LoginPage: React.FC = () => {
                   minLength={4}
                 />
               </div>
+              
               {error && <p className={styles.error}>{error}</p>}
+              
               <button
                 type="submit"
                 disabled={isSubmitting || !email || !senha}
@@ -94,15 +137,83 @@ const LoginPage: React.FC = () => {
               >
                 {isSubmitting ? "Entrando..." : "Entrar"}
               </button>
+              
               <p className={styles.forgot}>
                 Esqueceu a senha?{" "}
-                <a href="#recuperar" className={styles.link}>
+                {/* Alterado para chamar a função openModal */}
+                <a href="#recuperar" className={styles.link} onClick={openModal}>
                   Clique aqui
                 </a>
               </p>
             </form>
           </div>
         </div>
+
+        {/* --- MODAL DE RECUPERAÇÃO DE SENHA --- */}
+        {showModal && (
+          <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
+            {/* stopPropagation evita que clicar dentro do modal feche ele */}
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+              <h2 className={styles.modalTitle}>Recuperar Senha</h2>
+              
+              {resetMessage.type === "success" ? (
+                <div className={styles.successMessage}>
+                    <p>{resetMessage.text}</p>
+                    <button 
+                        className={styles.buttonCancel} 
+                        style={{marginTop: '10px', width: '100%', background: 'white'}}
+                        onClick={() => setShowModal(false)}
+                    >
+                        Fechar
+                    </button>
+                </div>
+              ) : (
+                <>
+                  <p className={styles.modalText}>
+                    Digite seu e-mail abaixo para receber um link de redefinição.
+                  </p>
+                  <form onSubmit={handleForgotPassword}>
+                    <div className={styles.field}>
+                      <label htmlFor="resetEmail" className={styles.label}>E-mail cadastrado</label>
+                      <input
+                        id="resetEmail"
+                        type="email"
+                        className={styles.input}
+                        placeholder="exemplo@email.com"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    
+                    {resetMessage.type === "error" && (
+                        <p className={styles.error} style={{marginBottom: '1rem'}}>{resetMessage.text}</p>
+                    )}
+
+                    <div className={styles.modalActions}>
+                      <button
+                        type="button"
+                        className={styles.buttonCancel}
+                        onClick={() => setShowModal(false)}
+                        disabled={isResetting}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className={styles.submit}
+                        style={{ width: 'auto', marginTop: 0 }}
+                        disabled={isResetting || !resetEmail}
+                      >
+                        {isResetting ? "Enviando..." : "Enviar Link"}
+                      </button>
+                    </div>
+                  </form>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </main>
       <Footer year={2025} />
     </div>

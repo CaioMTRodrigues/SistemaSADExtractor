@@ -95,11 +95,18 @@ export async function updateUserApi(
 
 export async function resendFirstPassword(userId: string) {
   const res = await api.post(`/auth/resend-first-password/${userId}`);
-  return res.data; // 
+  return res.data; 
 }
 
 export async function createPassword(payload: { token: string; password: string }) {
   const res = await api.post("/auth/first-password", payload);
+  return res.data;
+}
+
+// Função esqueci minha senha
+export async function forgotPassword(email: string) {
+  // Envia o e-mail no corpo da requisição para a rota criada no backend
+  const res = await api.post("/auth/forgot-password", { email });
   return res.data;
 }
 

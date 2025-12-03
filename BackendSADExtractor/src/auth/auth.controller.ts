@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { createUser, firstPassword, signIn } from "./auth.service.js";
-
+import { prisma } from "../lib/db.js";
 import { getOneUser } from "../user/user.service.js";
 import { auth } from "../lib/auth.js";
 class AuthController {
@@ -79,6 +79,40 @@ class AuthController {
       return res
         .status(500)
         .json({ message: "Error setting first password", error: error });
+    }
+  }
+//Esqueci a senha 
+  async forgotPassword(req: Request, res: Response) {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "E-mail é obrigatório" });
+    }
+
+    try {
+      // 1. Buscamos o usuário pelo e-mail (já que o front não tem o ID)
+      const user = await prisma.user.findUnique({
+        where: { email, active: true },
+      });
+
+      // 2. Segurança: Se não achar, dizemos que enviamos para não revelar quem é cadastrado
+      if (!user) {
+        return res.status(200).json({ message: "Se o e-mail existir, o link foi enviado." });
+      }
+
+      // 3. REUTILIZAÇÃO: Chamamos a mesma função que o resendFirstPasswordEmail chama.
+      // Isso vai acionar o seu arquivo 'resend.ts' automaticamente.
+      await auth.api.requestPasswordReset({
+        body: {
+          email: user.email,
+          redirectTo: "/create-password", // Mantém o fluxo de criar senha
+        },
+      });
+
+      return res.status(200).json({ message: "Link enviado com sucesso." });
+    } catch (error) {
+      console.error("Erro no forgotPassword:", error);
+      return res.status(500).json({ message: "Erro interno ao processar solicitação." });
     }
   }
 }

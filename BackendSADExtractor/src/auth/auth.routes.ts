@@ -22,4 +22,7 @@ authRouter.post("/resend-first-password/:id", requireRole("ADMIN"), (req: Reques
   authController.resendFirstPasswordEmail(req, res);
 });
 
+//Esqueci a senha
+authRouter.post("/forgot-password", authController.forgotPassword.bind(authController));
+
 export default authRouter;
