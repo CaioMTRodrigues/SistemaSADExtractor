@@ -4,6 +4,7 @@ import {
   createExtracao,
   createLaudo,
   deleteLaudo,
+  getAllLaudos,
   getAllUsers,
   getEdicoes,
   getLaudosByIds,
@@ -123,6 +124,15 @@ class UserController {
       return res.status(200).json(laudos);
     } catch (error) {
       return res.status(500).json({ message: "Error retrieving laudos", error });
+    }
+  }
+
+  async getAllLaudos(req: Request, res: Response) {
+    try {
+      const laudos = await getAllLaudos();
+      return res.status(200).json(laudos);
+    } catch (error) {
+      return res.status(500).json({ message: "Error retrieving all laudos", error });
     }
   }
 

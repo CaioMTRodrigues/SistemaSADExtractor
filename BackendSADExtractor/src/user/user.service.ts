@@ -82,6 +82,47 @@ export const getLaudosByIds = async (laudoIds: string[]) => {
   }
 };
 
+export const getAllLaudos = async () => {
+  const laudos = await prisma.laudo.findMany({
+    include: {
+      extracaos: true, // pega todos os campos extraídos daquele laudo
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return laudos.map((laudo) => {
+    const getCampo = (nome: string) =>
+      laudo.extracaos.find((e) => e.nome_campo === nome)?.valor_extraido ?? null;
+
+    // Ajuste os nomes conforme seus nomes de campo na extração
+    const numeroDocumento = getCampo("numeroDocumento");
+    const endereco = getCampo("endereco");
+    const coordS = getCampo("coordenadaS");
+    const coordW = getCampo("coordenadaW");
+    const conservacao = getCampo("estadoConservacao");
+
+    // escolha o que você quer mostrar na coluna "Valor"
+    const valor =
+      getCampo("valorTerreno") ??
+      getCampo("valorConstrucaoNova") ??
+      getCampo("valorAreaConstruida");
+
+    const dataValoracao = getCampo("dataValoracao"); // ISO (AAAA-MM-DD) se veio da IA
+    const data = dataValoracao ?? laudo.createdAt.toISOString();
+
+    return {
+      laudoId: laudo.id,
+      numeroDocumento,
+      endereco,
+      coordS,
+      coordW,
+      conservacao,
+      valor,
+      data, // ISO string
+    };
+  });
+};
+
 export const createLaudo = async (laudoData: {
   userId: string;
   nome_arquivo: string;

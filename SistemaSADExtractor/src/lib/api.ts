@@ -70,6 +70,17 @@ export type Laudo = {
   updatedAt: string;
 };
 
+export type HistoricoLaudo = {
+  laudoId: string;
+  numeroDocumento: string | null;
+  endereco: string | null;
+  coordS: string | null;
+  coordW: string | null;
+  conservacao: string | null;
+  valor: string | null;
+  data: string | null; // ISO
+};
+
 // Exemplo de função para login
 export async function login(email: string, senha: string) {
   const response = await api.post("/auth/login", { email, senha });
@@ -79,6 +90,11 @@ export async function login(email: string, senha: string) {
 export async function createLaudo(payload: CreateLaudoPayload): Promise<Laudo> {
   const response = await api.post("/user/laudo", payload);
   return response.data.laudo;
+}
+
+export async function fetchAllLaudos(): Promise<HistoricoLaudo[]> {
+  const res = await api.get<HistoricoLaudo[]>("/user/all-laudos");
+  return res.data;
 }
 
 export async function deleteLaudo(laudoId: string): Promise<void> {

@@ -12,6 +12,10 @@ userRouter.get("/laudos", requireRole("CADASTRO", "GESTOR", "ADMIN"), (req: Requ
     userController.getLaudosByIds(req, res);
 });
 
+userRouter.get("/all-laudos", requireRole("ADMIN", "CADASTRO"), (req: Request, res: Response) => {
+    userController.getAllLaudos(req, res);
+});
+
 userRouter.get("/:id", requireRole("ADMIN"), (req: Request, res: Response) => {
     userController.getUserById(req, res);
 });
