@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 import Stepper from "../components/Stepper";
 import UploadDropzone from "../components/UploadDropzone";
 import styles from "./UploadPage.module.css";
-import { useNavigate } from "react-router-dom";
+import { createSearchParams, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { createLaudo } from "../lib/api"; // sua instância axios
 
@@ -89,21 +89,31 @@ const UploadPage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      await Promise.all(
-        files.map(async ({ file }) => {
-          const base64 = await fileToBase64(file);
+      const createdIds: string[] = [];
 
-          await createLaudo({
-            userId,
-            nome_arquivo: file.name,
-            qtd_campo_extraido: 0,
-            arquivo: base64,
-          });
-        })
-      );
+      // Envia os laudos SEQUENCIALMENTE
+      for (const { file } of files) {
+        const base64 = await fileToBase64(file);
 
-      // se tudo deu certo, segue o fluxo para edição
-      navigateEdit(`/${userType}/edit`);
+        // só passa pro próximo arquivo depois que essa chamada terminar
+        const laudo = await createLaudo({
+          userId,
+          nome_arquivo: file.name,
+          qtd_campo_extraido: 0,
+          arquivo: base64,
+        });
+
+        createdIds.push(laudo.id);
+      }
+
+      const search = createSearchParams({
+        laudos: createdIds.join(","), // "id1,id2,id3"
+      }).toString();
+
+      navigateEdit({
+        pathname: `/${userType}/edit`,
+        search: `?${search}`,
+      });
     } catch (error) {
       console.error("Erro ao enviar laudos:", error);
       // tratar erro (toast, mensagem na tela, etc.)

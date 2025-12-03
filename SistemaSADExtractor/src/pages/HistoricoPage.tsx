@@ -1,58 +1,29 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import styles from "./HistoricoPage.module.css";
 import { useAuthStore } from "../store/useAuthStore";
+import { fetchAllLaudos } from "../lib/api";
 
 type Row = {
-  id: string;
+  laudoId: string; // id do banco (cuid)
+  numeroDocumento: string; // o "LA 000 SAD/XXX"
   endereco: string;
   coordS: string;
   coordW: string;
   conservacao: string;
   valor: string;
-  data: string;
+  data: string; // já formatada para dd/MM/aaaa
   checked?: boolean;
 };
-
-const mockData: Row[] = [
-  {
-    id: "LA 000 SAD/XXX",
-    endereco: "Rua XXXX XXXX",
-    coordS: "0°00'00.0''S",
-    coordW: "0°00'00.0''W",
-    conservacao: "Ótimo",
-    valor: "R$ X.xxx.xxx,xx",
-    data: "20/04/2025",
-    checked: false,
-  },
-  {
-    id: "LA 001 SAD/YY",
-    endereco: "Avenida ABC 123",
-    coordS: "1°00'00.0''S",
-    coordW: "1°00'00.0''W",
-    conservacao: "Ruim",
-    valor: "R$ X.xxx.xxx,xx",
-    data: "05/05/2025",
-    checked: false,
-  },
-  {
-    id: "LA 002 SAD/ZZ",
-    endereco: "Travessa 90",
-    coordS: "2°00'00.0''S",
-    coordW: "2°00'00.0''W",
-    conservacao: "Regular",
-    valor: "R$ X.xxx.xxx,xx",
-    data: "11/05/2025",
-    checked: false,
-  },
-];
 
 export default function HistoricoPage() {
   const userType = useAuthStore((s) => s.userType);
 
-  const [rows, setRows] = useState<Row[]>(mockData);
+  const [rows, setRows] = useState<Row[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [searchId, setSearchId] = useState("");
   const [searchEndereco, setSearchEndereco] = useState("");
   const [searchCoord, setSearchCoord] = useState("");
@@ -61,6 +32,40 @@ export default function HistoricoPage() {
   const [page, setPage] = useState(1);
   const perPage = 4;
 
+  useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true);
+        setError("");
+        const data = await fetchAllLaudos();
+
+        const mapped: Row[] = data.map((l) => ({
+          laudoId: l.laudoId,
+          numeroDocumento: l.numeroDocumento ?? "-",
+          endereco: l.endereco ?? "-",
+          coordS: l.coordS ?? "-",
+          coordW: l.coordW ?? "-",
+          conservacao: l.conservacao ?? "-",
+          valor: l.valor
+            ? `R$ ${Number(l.valor).toLocaleString("pt-BR", {
+                minimumFractionDigits: 2,
+              })}`
+            : "-",
+          data: l.data ? new Date(l.data).toLocaleDateString("pt-BR") : "-",
+          checked: false,
+        }));
+
+        setRows(mapped);
+      } catch (e) {
+        console.error(e);
+        setError("Erro ao carregar laudos.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
+  }, []);
   const navbarItems = useMemo(() => {
     const base = [
       { label: "Upload de Documentos", href: `/${userType}/upload` },
@@ -68,34 +73,35 @@ export default function HistoricoPage() {
       { label: "Exportar", href: `/${userType}/exportar` },
       { label: "Histórico de Laudos", href: `/${userType}/historico` },
     ];
-  
-  
+
     if (userType === "gestor" || userType === "admin") {
       base.push(
-        { label: "Histórico de Usuários", href: `/${userType}/historico-usuarios` },
+        {
+          label: "Histórico de Usuários",
+          href: `/${userType}/historico-usuarios`,
+        },
         { label: "Indicadores", href: `/${userType}/indicadores` }
       );
     }
-  
-  
+
     if (userType === "admin") {
       base.push({
         label: "Configurações",
         href: `/${userType}/configuracoes`,
       });
     }
-  
+
     return base;
   }, [userType]);
-  
-
 
   const filteredRows = useMemo(() => {
     return rows.filter((r) => {
       return (
-        r.id.toLowerCase().includes(searchId.toLowerCase()) &&
+        r.numeroDocumento.toLowerCase().includes(searchId.toLowerCase()) &&
         r.endereco.toLowerCase().includes(searchEndereco.toLowerCase()) &&
-        (r.coordS + " " + r.coordW).toLowerCase().includes(searchCoord.toLowerCase()) &&
+        (r.coordS + " " + r.coordW)
+          .toLowerCase()
+          .includes(searchCoord.toLowerCase()) &&
         r.data.includes(searchDate)
       );
     });
@@ -104,32 +110,37 @@ export default function HistoricoPage() {
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / perPage));
   const pageRows = filteredRows.slice((page - 1) * perPage, page * perPage);
 
-  const allChecked = filteredRows.length > 0 && filteredRows.every(r => r.checked);
-  const selectedCount = filteredRows.filter(r => r.checked).length;
+  const allChecked =
+    filteredRows.length > 0 && filteredRows.every((r) => r.checked);
+  const selectedCount = filteredRows.filter((r) => r.checked).length;
 
   function toggleRow(id: string, checked: boolean) {
-    setRows(prev => prev.map(r => r.id === id ? { ...r, checked } : r));
+    setRows((prev) =>
+      prev.map((r) => (r.laudoId === id ? { ...r, checked } : r))
+    );
   }
 
   function toggleAll(checked: boolean) {
-    setRows(prev => prev.map(r => ({ ...r, checked })));
+    setRows((prev) => prev.map((r) => ({ ...r, checked })));
   }
 
   function removeSelected() {
-    setRows(prev => prev.filter(r => !r.checked));
+    setRows((prev) => prev.filter((r) => !r.checked));
   }
 
   return (
     <div className={styles.page}>
-      <Header
-      />
+      <Header />
 
       <Navbar items={navbarItems} userName="Nome de usuário" />
 
       <main className={styles.main}>
         <div className={styles.container}>
           <h2 className={styles.title}>Histórico de Laudos</h2>
-          <p className={styles.subtitle}>Visualização dos dados de todos os laudos que foram extraídos ao longo do tempo.</p>
+          <p className={styles.subtitle}>
+            Visualização dos dados de todos os laudos que foram extraídos ao
+            longo do tempo.
+          </p>
 
           {/* FILTROS */}
           <div className={styles.filters}>
@@ -161,7 +172,7 @@ export default function HistoricoPage() {
             <div className={styles.tableHeader}>
               <span className={styles.tableTitle}>Tabela padrão</span>
             </div>
-
+            {error && !loading && <div className={styles.error}>{error}</div>}
             <div className={styles.table}>
               <div className={styles.tr}>
                 <div className={styles.th}>
@@ -180,16 +191,24 @@ export default function HistoricoPage() {
                 <div className={styles.th}>Data</div>
               </div>
 
+              {loading && rows.length === 0 && (
+                <div className={styles.loading}>Carregando laudos...</div>
+              )}
+
+              {!loading && rows.length === 0 && (
+                <div className={styles.empty}>Nenhum laudo para exibir.</div>
+              )}
+
               {pageRows.map((r) => (
-                <div key={r.id} className={styles.tr}>
+                <div key={r.laudoId} className={styles.tr}>
                   <div className={styles.td}>
                     <input
                       type="checkbox"
                       checked={!!r.checked}
-                      onChange={(e) => toggleRow(r.id, e.target.checked)}
+                      onChange={(e) => toggleRow(r.laudoId, e.target.checked)}
                     />
                   </div>
-                  <div className={styles.td}>{r.id}</div>
+                  <div className={styles.td}>{r.numeroDocumento}</div>
                   <div className={styles.td}>{r.endereco}</div>
                   <div className={styles.td}>{r.coordS}</div>
                   <div className={styles.td}>{r.coordW}</div>
@@ -202,9 +221,18 @@ export default function HistoricoPage() {
 
             {/* PAGINAÇÃO */}
             <div className={styles.pagination}>
-              <button disabled={page === 1} onClick={() => setPage(page - 1)}>‹</button>
-              <span>{page} / {totalPages}</span>
-              <button disabled={page === totalPages} onClick={() => setPage(page + 1)}>›</button>
+              <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+                ‹
+              </button>
+              <span>
+                {page} / {totalPages}
+              </span>
+              <button
+                disabled={page === totalPages}
+                onClick={() => setPage(page + 1)}
+              >
+                ›
+              </button>
             </div>
           </div>
 
@@ -232,7 +260,6 @@ export default function HistoricoPage() {
               </button>
             </div>
           </div>
-
         </div>
       </main>
 

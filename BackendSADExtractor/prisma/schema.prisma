@@ -46,6 +46,7 @@ model Laudo {
   userId             String
   nome_arquivo       String
   qtd_campo_extraido Int
+  confiabilidade     String?
   arquivo            String?
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @default(now()) @updatedAt
@@ -74,7 +75,6 @@ model Extracao {
   nome_campo     String
   valor_extraido String
   valor_editado  String?
-  confiabilidade Float
   laudo          Laudo   @relation(fields: [laudoId], references: [id], onDelete: Cascade)
   user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 

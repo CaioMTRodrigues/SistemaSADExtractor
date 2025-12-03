@@ -4,7 +4,7 @@ import { BACKEND } from "./env";
 // Configuração geral do axios
 const api = axios.create({
   baseURL: BACKEND, // ajuste para a URL do seu backend se necessário
-  timeout: 10000,
+  timeout: 100000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -59,15 +59,54 @@ export type UserDto = {
   totalAccess: number;
 };
 
+export type Laudo = {
+  id: string;
+  userId: string;
+  nome_arquivo: string;
+  qtd_campo_extraido: number;
+  confiabilidade: number | null;
+  arquivo: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type HistoricoLaudo = {
+  laudoId: string;
+  numeroDocumento: string | null;
+  endereco: string | null;
+  coordS: string | null;
+  coordW: string | null;
+  conservacao: string | null;
+  valor: string | null;
+  data: string | null; // ISO
+};
+
 // Exemplo de função para login
 export async function login(email: string, senha: string) {
   const response = await api.post("/auth/login", { email, senha });
   return response.data;
 }
 
-export async function createLaudo(payload: CreateLaudoPayload) {
+export async function createLaudo(payload: CreateLaudoPayload): Promise<Laudo> {
   const response = await api.post("/user/laudo", payload);
-  return response.data;
+  return response.data.laudo;
+}
+
+export async function fetchAllLaudos(): Promise<HistoricoLaudo[]> {
+  const res = await api.get<HistoricoLaudo[]>("/user/all-laudos");
+  return res.data;
+}
+
+export async function deleteLaudo(laudoId: string): Promise<void> {
+  await api.delete(`/user/laudo/${laudoId}`);
+}
+
+export async function fetchLaudosByIds(ids: string[]): Promise<Laudo[]> {
+  if (!ids.length) return [];
+  const res = await api.get<Laudo[]>("/user/laudos", {
+    params: { ids: ids.join(",") },
+  });
+  return res.data;
 }
 
 export async function fetchUsers(page: number = 1, limit: number = 5): Promise<FetchUsersResponse> {

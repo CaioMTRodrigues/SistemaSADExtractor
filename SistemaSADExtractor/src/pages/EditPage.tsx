@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
@@ -8,10 +8,11 @@ import styles from "./EditPage.module.css";
 import clsx from "clsx";
 import { useAuthStore } from "../store/useAuthStore";
 import ConfirmValidateModal from "../components/ConfirmValidateModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { deleteLaudo, fetchLaudosByIds, type Laudo } from "../lib/api";
 
 type Row = {
-  id: number;
+  id: string;
   name: string;
   extracted: number;
   total: number;
@@ -21,18 +22,14 @@ type Row = {
   error?: boolean;
 };
 
-const initialRows: Row[] = [
-  { id: 1, name: "Laudo_xxx.pdf", extracted: 12, total: 30, confidence: 40, action: "revisar" },
-  { id: 2, name: "Laudo_xxx.pdf", extracted: 30, total: 30, confidence: 100, action: "prosseguir", checked: true },
-  { id: 3, name: "Laudo_xxx.pdf", extracted: 21, total: 30, confidence: 70, action: "prosseguir", checked: true },
-  { id: 4, name: "Laudo_xxx.pdf", extracted: 3, total: 30, confidence: 10, action: "descartado", error: true },
-];
-
 export default function EditPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(4);
-  const [rows, setRows] = useState<Row[]>(initialRows);
+  const [rows, setRows] = useState<Row[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const idsParam = searchParams.get("laudos");
 
   const navigate = useNavigate();
   const userType = useAuthStore((s) => s.userType);
@@ -43,32 +40,89 @@ export default function EditPage() {
     return rows.slice(start, start + perPage);
   }, [rows, page, perPage]);
 
-  const allChecked = rows.length > 0 && rows.every(r => r.checked);
-  const selectedCount = rows.filter(r => r.checked).length;
+  const allChecked = rows.length > 0 && rows.every((r) => r.checked);
+  const selectedCount = rows.filter((r) => r.checked).length;
 
-  function toggleRow(id: number, checked: boolean) {
-    setRows(prev => prev.map(r => (r.id === id ? { ...r, checked } : r)));
+  const laudoIds = useMemo(
+    () => (idsParam ? idsParam.split(",").filter(Boolean) : []),
+    [idsParam]
+  );
+
+  const TOTAL_CAMPOS_PADRAO = 20; // ou 30, conforme sua regra
+
+  function mapLaudosToRows(laudos: Laudo[]): Row[] {
+    return laudos.map((l: Laudo) => {
+      const total = TOTAL_CAMPOS_PADRAO;
+      const extracted = (l.qtd_campo_extraido - 1);
+      const confi = (l.confiabilidade ?? 0) * 100; 
+
+      let action: Row["action"];
+      if (confi < 30) {
+        action = "descartado";
+      } else if (confi >= 30 && confi < 90) {
+        action = "revisar";
+      } else {
+        action = "prosseguir";
+      }
+
+      return {
+        id: l.id,
+        name: l.nome_arquivo,
+        extracted,
+        total,
+        confidence: confi,
+        action,
+        checked: action === "prosseguir",
+        error: action === "descartado",
+      };
+    });
+  }
+
+  useEffect(() => {
+    if (!laudoIds.length) return;
+
+    async function load() {
+      setLoading(true);
+      try {
+        const laudos = await fetchLaudosByIds(laudoIds);
+        const mapped = mapLaudosToRows(laudos); // sua função de mapeamento
+        setRows(mapped);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
+  }, [laudoIds]);
+
+  function toggleRow(id: string, checked: boolean) {
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, checked } : r)));
   }
 
   function toggleAll(checked: boolean) {
-    setRows(prev => prev.map(r => ({ ...r, checked })));
+    setRows((prev) => prev.map((r) => ({ ...r, checked })));
   }
 
-  function removeRow(id: number) {
-    setRows(prev => prev.filter(r => r.id !== id));
+  async function removeRow(id: string) {
+    try {
+    // 1) apaga no backend
+    await deleteLaudo(id);
+
+    // 2) se deu certo, remove da tabela (UI)
+    setRows((prev) => prev.filter((r) => r.id !== id));
+  } catch (e) {
+    console.error("Erro ao deletar laudo:", e);
+    alert("Erro ao excluir laudo. Tente novamente.");
+  }
   }
 
   function removeSelected() {
-    setRows(prev => prev.filter(r => !r.checked));
+    setRows((prev) => prev.filter((r) => !r.checked));
   }
 
   function validateSelected() {
     if (!selectedCount) return;
     alert(`${selectedCount} laudo(s) enviados para validação.`);
-  }
-
-  function percent(r: Row) {
-    return Math.round((r.extracted / r.total) * 100);
   }
 
   const navbarItems = useMemo(() => {
@@ -78,31 +132,30 @@ export default function EditPage() {
       { label: "Exportar", href: `/${userType}/exportar` },
       { label: "Histórico de Laudos", href: `/${userType}/historico` },
     ];
-  
-  
+
     if (userType === "gestor" || userType === "admin") {
       base.push(
-        { label: "Histórico de Usuários", href: `/${userType}/historico-usuarios` },
+        {
+          label: "Histórico de Usuários",
+          href: `/${userType}/historico-usuarios`,
+        },
         { label: "Indicadores", href: `/${userType}/indicadores` }
       );
     }
-  
-  
+
     if (userType === "admin") {
       base.push({
         label: "Configurações",
         href: `/${userType}/configuracoes`,
       });
     }
-  
+
     return base;
   }, [userType]);
-  
 
   return (
     <div className={styles.page}>
-      <Header
-      />
+      <Header />
 
       <Navbar items={navbarItems} userName="Nome de usuário" />
 
@@ -113,7 +166,9 @@ export default function EditPage() {
           <section className={styles.card}>
             <header className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>Edição dos dados extraídos</h2>
-              <p className={styles.cardSub}>Revise o resumo dos dados extraídos a partir dos laudos</p>
+              <p className={styles.cardSub}>
+                Revise o resumo dos dados extraídos a partir dos laudos
+              </p>
             </header>
 
             <div className={styles.tableWrap}>
@@ -132,14 +187,31 @@ export default function EditPage() {
                   </div>
                   <div className={clsx(styles.th, styles.center)}>ID</div>
                   <div className={styles.th}>Nome do arquivo</div>
-                  <div className={clsx(styles.th, styles.center)}>Dados extraídos</div>
+                  <div className={clsx(styles.th, styles.center)}>
+                    Dados extraídos
+                  </div>
                   <div className={clsx(styles.th, styles.center)}>%</div>
-                  <div className={clsx(styles.th, styles.center)}>Confiabilidade</div>
-                  <div className={clsx(styles.th, styles.center)}>Ação recomendada</div>
+                  <div className={clsx(styles.th, styles.center)}>
+                    Confiabilidade
+                  </div>
+                  <div className={clsx(styles.th, styles.center)}>
+                    Ação recomendada
+                  </div>
                 </div>
 
+                {loading && rows.length === 0 && (
+                  <div className={styles.loading}>Carregando laudos...</div>
+                )}
+
+                {!loading && rows.length === 0 && (
+                  <div className={styles.empty}>Nenhum laudo para exibir.</div>
+                )}
+
                 {pageRows.map((r) => (
-                  <div key={r.id} className={clsx(styles.tr, r.error && styles.rowError)}>
+                  <div
+                    key={r.id}
+                    className={clsx(styles.tr, r.error && styles.rowError)}
+                  >
                     <div className={clsx(styles.td, styles.center)}>
                       <input
                         type="checkbox"
@@ -148,12 +220,23 @@ export default function EditPage() {
                       />
                     </div>
 
-                    <div className={clsx(styles.td, styles.center)}>{r.id}</div>
+                    <div
+                      className={clsx(styles.td, styles.center)}
+                      title={r.id}
+                    >
+                      {r.id.substring(0, 8)}...
+                    </div>
 
                     <div className={styles.td}>
-                      <a href="#" className={styles.fileLink}>{r.name}</a>
-                      {r.action === "descartado" && <span className={styles.badgeDanger}>!</span>}
-                      {r.action === "prosseguir" && <span className={styles.badgeOk}>●</span>}
+                      <a href="#" className={styles.fileLink}>
+                        {r.name}
+                      </a>
+                      {r.action === "descartado" && (
+                        <span className={styles.badgeDanger}>!</span>
+                      )}
+                      {r.action === "prosseguir" && (
+                        <span className={styles.badgeOk}>●</span>
+                      )}
                     </div>
 
                     <div className={clsx(styles.td, styles.center)}>
@@ -161,14 +244,20 @@ export default function EditPage() {
                     </div>
 
                     <div className={clsx(styles.td, styles.center)}>
-                      {percent(r)}%
+                      {r.confidence}%
                     </div>
 
                     <div className={clsx(styles.td, styles.center)}>
                       <ConfidenceBar value={r.confidence} />
                     </div>
 
-                    <div className={clsx(styles.td, styles.center, styles.actionCell)}>
+                    <div
+                      className={clsx(
+                        styles.td,
+                        styles.center,
+                        styles.actionCell
+                      )}
+                    >
                       <span
                         className={clsx(
                           styles.actionText,
@@ -182,9 +271,15 @@ export default function EditPage() {
                         {r.action === "descartado" && "Descartado"}
                       </span>
 
-                      <button className={styles.trashBtn} onClick={() => removeRow(r.id)}>
+                      <button
+                        className={styles.trashBtn}
+                        onClick={() => removeRow(r.id)}
+                      >
                         <svg viewBox="0 0 24 24" width="18" height="18">
-                          <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm-4 0h2v9H6V9zm8 0h2v9h-2V9z" fill="#ef4444" />
+                          <path
+                            d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v9h-2V9zm-4 0h2v9H6V9zm8 0h2v9h-2V9z"
+                            fill="#ef4444"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -194,9 +289,19 @@ export default function EditPage() {
 
               <div className={styles.tableFooter}>
                 <div className={styles.bulkLeft}>
-                  <button className={styles.linkBtn} onClick={() => toggleAll(true)}>Selecionar tudo</button>
+                  <button
+                    className={styles.linkBtn}
+                    onClick={() => toggleAll(true)}
+                  >
+                    Selecionar tudo
+                  </button>
                   <span className={styles.sep}>|</span>
-                  <button className={styles.linkBtn} onClick={() => toggleAll(false)}>Desselecionar todos</button>
+                  <button
+                    className={styles.linkBtn}
+                    onClick={() => toggleAll(false)}
+                  >
+                    Desselecionar todos
+                  </button>
                 </div>
 
                 <div className={styles.pagination}>
@@ -218,16 +323,29 @@ export default function EditPage() {
 
                   <span className={styles.pageInfo}>
                     {rows.length
-                      ? `${(page - 1) * perPage + 1}-${Math.min(page * perPage, rows.length)} de ${rows.length}`
+                      ? `${(page - 1) * perPage + 1}-${Math.min(
+                          page * perPage,
+                          rows.length
+                        )} de ${rows.length}`
                       : "0 de 0"}
                   </span>
 
                   <div className={styles.pager}>
-                    <button className={styles.pagerBtn} onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                    <button
+                      className={styles.pagerBtn}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                    >
                       ‹
                     </button>
                     <span className={styles.pageNumber}>{page}</span>
-                    <button className={styles.pagerBtn} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+                    <button
+                      className={styles.pagerBtn}
+                      onClick={() =>
+                        setPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={page === totalPages}
+                    >
                       ›
                     </button>
                   </div>
@@ -237,14 +355,23 @@ export default function EditPage() {
 
             <div className={styles.bottomBar}>
               <div className={styles.selectedPill}>
-                {selectedCount} laudo{selectedCount === 1 ? "" : "s"} selecionado{selectedCount === 1 ? "" : "s"}
+                {selectedCount} laudo{selectedCount === 1 ? "" : "s"}{" "}
+                selecionado{selectedCount === 1 ? "" : "s"}
               </div>
 
               <div className={styles.bottomActions}>
-                <button className={styles.btnGhost} onClick={removeSelected} disabled={!selectedCount}>
+                <button
+                  className={styles.btnGhost}
+                  onClick={removeSelected}
+                  disabled={!selectedCount}
+                >
                   Remover selecionados
                 </button>
-                <button className={styles.btnPrimary} onClick={() => setModalOpen(true)} disabled={!selectedCount}>
+                <button
+                  className={styles.btnPrimary}
+                  onClick={() => setModalOpen(true)}
+                  disabled={!selectedCount}
+                >
                   Validar Dados
                 </button>
               </div>
