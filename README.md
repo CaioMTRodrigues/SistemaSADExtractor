@@ -3,11 +3,11 @@
 Projeto da Universidade de Pernambuco da disciplina de Sistemas Multimídia, para a Secretaria de Administração de Pernambuco - SAD.
 
 Alunos:
-**Caio Tenório** - Full-Stack Developer 
-**Samara Souza** - Backend Developer 
-**Brenno Lima** - Frontend Developer 
-**Nathalia Bacalhau** - Product Designer 
-**Ruan Santana** - QA 
+- **Caio Tenório** - Full-Stack Developer  
+- **Samara Souza** - Backend Developer  
+- **Brenno Lima** - Frontend Developer  
+- **Nathalia Bacalhau** - Product Designer  
+- **Ruan Santana** - QA  
 
 ## Arquitetura e Tecnologias
 
