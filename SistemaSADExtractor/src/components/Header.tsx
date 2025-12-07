@@ -1,6 +1,10 @@
 import styles from "./Header.module.css";
 import clsx from "clsx";
+
 import govPeBadge from "../assets/gov-pe-badge.png";
+import upePoliBadge from "../assets/upe-poli-badge.png";
+//import poliBadge from "../assets/poli-badge.png"; 
+//*<img src={poliBadge} className={styles.poliBadge} alt="POLI" /> 
 
 type HeaderProps = {
   className?: string;
@@ -19,7 +23,7 @@ export default function Header({ className }: HeaderProps) {
         </div>
 
         <div className={styles.right}>
-          
+          <img src={upePoliBadge} className={styles.poliBadge} alt="UPE" />
           <img src={govPeBadge} className={styles.govBadge} alt="Governo de Pernambuco" />
         </div>
       </div>

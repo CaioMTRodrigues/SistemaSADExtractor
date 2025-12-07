@@ -76,8 +76,8 @@ export default function ConfiguracoesPage() {
   const navbarItems = useMemo(() => {
     const base = [
       { label: "Upload de Documentos", href: `/${userType}/upload` },
-      { label: "Editar Dados", href: `/${userType}/edit` },
-      { label: "Exportar Dados", href: `/${userType}/exportar` },
+      { label: "Editar", href: `/${userType}/edit` },
+      { label: "Exportar", href: `/${userType}/exportar` },
       { label: "Histórico de Laudos", href: `/${userType}/historico` },
     ];
 

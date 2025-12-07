@@ -1,0 +1,48 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #fff;
+  width: 380px;
+  padding: 26px;
+  border-radius: 12px;
+  animation: show 0.2s ease-out;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+}
+
+@keyframes show {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.text {
+  font-size: 15px;
+  margin-bottom: 22px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.confirm {
+  background: #0a4fbf;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}

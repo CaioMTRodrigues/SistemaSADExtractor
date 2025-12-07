@@ -12,9 +12,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 32px; 
+  gap: 32px;
 }
-
 
 .left {
   display: flex;
@@ -43,23 +42,20 @@
   opacity: 0.9;
 }
 
-
 .right {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.govText {
-  text-align: right;
-  font-size: 13px;
-  line-height: 1.1;
-}
-
-.govTextLine {
-  font-weight: 700;
+  gap: 16px; 
 }
 
 .govBadge {
   height: 48px;
+  object-fit: contain;
 }
+
+.poliBadge {
+  height: 42px;
+  object-fit: contain;
+}
+
+

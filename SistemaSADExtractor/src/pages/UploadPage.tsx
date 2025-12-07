@@ -53,7 +53,7 @@ const UploadPage: React.FC = () => {
   const navbarItems = useMemo(() => {
     const base = [
       { label: "Upload de Documentos", href: `/${userType}/upload` },
-      { label: "Editar Dados", href: `/${userType}/edit` },
+      { label: "Editar", href: `/${userType}/edit` },
       { label: "Exportar", href: `/${userType}/exportar` },
       { label: "Histórico de Laudos", href: `/${userType}/historico` },
     ];

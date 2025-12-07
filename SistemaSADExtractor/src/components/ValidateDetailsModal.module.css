@@ -1,0 +1,92 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal {
+  width: 900px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px 28px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #555;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.section {
+  margin-top: 28px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px 24px;
+}
+
+.label {
+  font-size: 13px;
+  color: #666;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.notFound {
+  color: #d00;
+  font-weight: 600;
+}
+
+.footer {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btnPrimary {
+  padding: 10px 22px;
+  background: #1d4ed8;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}

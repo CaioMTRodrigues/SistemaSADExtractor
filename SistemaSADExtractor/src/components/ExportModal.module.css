@@ -1,0 +1,67 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: #fff;
+  width: 420px;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.15);
+  animation: popup 0.2s ease-out;
+}
+
+@keyframes popup {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.text {
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.format {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2563eb;
+  margin-bottom: 20px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancel {
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: #e5e7eb;
+  border: none;
+  cursor: pointer;
+}
+
+.confirm {
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
